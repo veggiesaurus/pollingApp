@@ -2,9 +2,9 @@ window.onload = function() {
 
 	var messages = [];
 	var socket = io.connect('http://localhost:3700');
-	var field = document.getElementById("field");
+	var field = document.getElementById("message");
 	var sendButton = document.getElementById("send");
-	var content = document.getElementById("content");
+	var chatBox = document.getElementById("chatBox");
 	var name = document.getElementById("name");
 
 	socket.on('message', function (data) {
@@ -14,8 +14,8 @@ window.onload = function() {
 			for(var i=0; i<messages.length; i++) {
 				html += '<b>' + (messages[i].username ? messages[i].username : 'Server') + ': </b>';
 				html += messages[i].message + '<br />';
-			}
-			content.innerHTML = html;
+			}			
+			chatBox.innerHTML = html;
 		} else {
 			console.log("There is a problem:", data);
 		}
@@ -33,7 +33,7 @@ window.onload = function() {
 
 }
 $(document).ready(function() {
-	$("#field").keyup(function(e) {
+	$("#message").keyup(function(e) {
 		if(e.keyCode == 13) {
 			sendMessage();
 		}

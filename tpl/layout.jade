@@ -1,0 +1,12 @@
+doctype 5
+html
+	head
+		title= "Real time web chat"
+		link(rel='stylesheet', href='/jquery/jquery.mobile-1.3.1.min.css')
+		script(src='/jquery/jquery-1.10.0.min.js')
+		script(src='/jquery/jquery.mobile-1.3.1.min.js')
+		script(src='/chat.js')
+		script(src='/socket.io/socket.io.js')
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	body(class="ui-mobile-viewport ui-overlay-c")
+		block content
