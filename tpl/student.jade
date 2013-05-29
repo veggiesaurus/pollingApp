@@ -1,0 +1,15 @@
+extends layout
+block headerScripts
+	script(src='/student.js')
+	
+block content
+	div#page1(data-role='page')
+		div(data-theme='a',data-role='header')
+			h3 Realtime Polling
+		div(data-role='content')
+			textarea#chatBox(cols="40", rows="8")
+			input#name(placeholder="Name")
+			input#message(placeholder="Message")
+			a#send(data-role='button',value='send') Send
+		div(data-theme='a',data-role='footer',data-position='fixed')
+			h3 UCT Physics
