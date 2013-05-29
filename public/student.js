@@ -5,7 +5,7 @@ window.onload = function()
 	var messages = [];
 	var polls = [];
 	sessionStorage.setItem("courseCode", "1004W");
-	socket = io.connect('http://localhost:3700');	
+	socket = io.connect(window.location.hostname);	
 
 	socket.on('connectionSuccess', function ()
 	{
@@ -33,4 +33,25 @@ window.onload = function()
 			console.log("There is a problem:", data);
 		}
 	});	
+}
+
+function displayPollOptions(pollName, numOptions)
+{
+	var headerHtml="<h3 align='center'>Current Poll: "+pollName+"</h3>";
+	headerHtml+="<fieldset align='center' data-theme='a' data-role='controlgroup' data-type='horizontal'>";
+	var optionsHtml="";
+	var swatch=["", "f", "g", "h", "i", "j"];
+	for (var i=1;i<=numOptions;i++)
+	{
+		optionsHtml+="<a data-role='button' data-transition='fade' data-theme='"+swatch[i]+"' onclick='submitPoll("+i+");'>"+i+"</a>"
+	}
+	var footerHtml="</fieldset>";
+	var totalHtml=headerHtml+optionsHtml+footerHtml;
+	$("#poll").html(totalHtml);	
+	$('.ui-page-active').page("destroy").page();
+}
+
+function submitPoll(option)
+{
+	console.log("Option "+option+" clicked");
 }

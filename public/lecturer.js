@@ -6,7 +6,7 @@ window.onload = function()
 {
 	messages = [];
 	var polls = [];	
-	socket = io.connect('http://localhost:3700');		
+	socket = io.connect(window.location.hostname);		
 	newPollButton = document.getElementById("btnNewPoll");
 	chatBox = document.getElementById("chatBox");	
 	
