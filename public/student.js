@@ -1,12 +1,28 @@
 var socket;
 
+$( document ).bind( 'mobileinit', initFunction);
+
+function initFunction()
+{
+    //disable zooming
+    $.extend($.mobile.zoom, {locked:true,enabled:false});
+    //loading screen
+    $.mobile.loader.prototype.options.text = "Loading";
+    $.mobile.loader.prototype.options.textVisible = true;
+    $.mobile.loader.prototype.options.theme = "a";
+    $.mobile.loader.prototype.options.html = "";  
+}
+
 window.onload = function() 
 {
+	$.mobile.loading( 'show');
 	var messages = [];
 	var polls = [];
 	sessionStorage.setItem("courseCode", "1004W");
 	socket = io.connect(window.location.hostname);	
 
+	
+	
 	socket.on('connectionSuccess', function ()
 	{
 		console.log("Connected to server, sending course code");
@@ -15,6 +31,7 @@ window.onload = function()
 	
 	socket.on('joinedRoom', function (data)
 	{
+		$.mobile.loading( 'hide');
 		if (data.success)
 			console.log("Client has been placed in the "+data.roomName+" room");
 		else
@@ -54,4 +71,6 @@ function displayPollOptions(pollName, numOptions)
 function submitPoll(option)
 {
 	console.log("Option "+option+" clicked");
+	$("#poll").html("<h3 align='center'>Submitted</h3>");	
+	$('.ui-page-active').page("destroy").page();
 }
