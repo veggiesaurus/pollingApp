@@ -8,8 +8,6 @@ block content
 			h3 Realtime Polling (Lecturer View)
 		div(data-role='content')
 			textarea#chatBox(cols="40", rows="8")
-			input#name(placeholder="Name")
-			input#message(placeholder="Message")
-			a#send(data-role='button',value='send') Send
-		div(data-theme='a',data-role='footer',data-position='fixed')
-			h3 UCT Physics
+			a#btnNewPoll(data-role='button') Create new poll
+			include lecturerPopups
+		

@@ -1,0 +1,8 @@
+#popupBasic(data-role='popup', data-position-to='#name', data-transition='fade', class='ui-content', style='max-width:280px')
+	a.ui-btn-right(href='#', data-rel='back', data-role='button', data-theme='a', data-icon='delete', data-iconpos='notext') Close
+	p
+		input#pollName(placeholder="Poll Name")
+		label(for='sliderNumoptions') How many options:
+		input#sliderNumoptions(type='range', name='sliderNumoptions', value='5', min='0', max='10', data-highlight="true", data-mini="true")
+		a#btnAcceptPoll(data-role='button',data-mini="true", onclick="CreatePoll();") Create
+		a#btnCancelPoll(data-rel="back", data-role="button", data-theme="b", data-transition="fade", data-mini="true") Cancel

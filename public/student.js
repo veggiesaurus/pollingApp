@@ -1,41 +1,36 @@
-window.onload = function() {
+var socket;
 
+window.onload = function() 
+{
 	var messages = [];
-	var socket = io.connect('http://localhost:3700');
-	var field = document.getElementById("message");
-	var sendButton = document.getElementById("send");
-	var chatBox = document.getElementById("chatBox");
-	var name = document.getElementById("name");
+	var polls = [];
+	sessionStorage.setItem("courseCode", "1004W");
+	socket = io.connect('http://localhost:3700');	
 
-	socket.on('message', function (data) {
-		if(data.message) {
-			messages.push(data);
-			var html = '';
-			for(var i=0; i<messages.length; i++) {
-				html += '<b>' + (messages[i].username ? messages[i].username : 'Server') + ': </b>';
-				html += messages[i].message + '<br />';
-			}			
-			chatBox.innerHTML = html;
-		} else {
+	socket.on('connectionSuccess', function ()
+	{
+		console.log("Connected to server, sending course code");
+		socket.emit('courseCode', sessionStorage.getItem("courseCode"));
+	});
+	
+	socket.on('joinedRoom', function (data)
+	{
+		if (data.success)
+			console.log("Client has been placed in the "+data.roomName+" room");
+		else
+			console.log("Client has failed to join room");
+	});
+	
+	socket.on('pushNewPoll', function (data) 
+	{
+		if(data.pollName) 
+		{
+			console.log("Current poll: ", data.pollName+". Number of options: "+data.numOptions);
+			displayPollOptions(data.pollName, data.numOptions);
+		} 
+		else 
+		{
 			console.log("There is a problem:", data);
 		}
-	});
-
-	sendButton.onclick = sendMessage = function() {
-		if(name.value == "") {
-			alert("Please type your name!");
-		} else {
-			var text = field.value;
-			socket.emit('send', { message: text, username: name.value });
-			field.value = "";
-		}
-	};
-
+	});	
 }
-$(document).ready(function() {
-	$("#message").keyup(function(e) {
-		if(e.keyCode == 13) {
-			sendMessage();
-		}
-	});
-});
