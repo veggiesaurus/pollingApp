@@ -19,6 +19,8 @@ window.onload = function()
 	var messages = [];
 	var polls = [];
 	sessionStorage.setItem("courseCode", "1004W");
+	sessionStorage.setItem("username", "cmrang001");
+	
 	socket = io.connect(window.location.hostname);	
 
 	
@@ -54,23 +56,36 @@ window.onload = function()
 
 function displayPollOptions(pollName, numOptions)
 {
-	var headerHtml="<h3 align='center'>Current Poll: "+pollName+"</h3>";
-	headerHtml+="<fieldset align='center' data-theme='a' data-role='controlgroup' data-type='horizontal'>";
+	$("#pollHeading").html("Current Poll: "+pollName);	
 	var optionsHtml="";
-	var swatch=["", "f", "g", "h", "i", "j"];
-	for (var i=1;i<=numOptions;i++)
+	//have to minus 1 because poll options are 1->N and array is 0->N-1
+	var swatch=["f", "g", "h", "i", "j"];
+	for (var i=0;i<numOptions;i++)
 	{
-		optionsHtml+="<a data-role='button' data-transition='fade' data-theme='"+swatch[i]+"' onclick='submitPoll("+i+");'>"+i+"</a>"
+		optionsHtml+="<a data-role='button' data-transition='fade' data-theme='"+swatch[i]+"' onclick='submitPoll(\""+pollName+"\" ,"+(i+1)+");'>Option "+(i+1)+"</a>"
 	}
-	var footerHtml="</fieldset>";
-	var totalHtml=headerHtml+optionsHtml+footerHtml;
-	$("#poll").html(totalHtml);	
+	$("#poll").html(optionsHtml);		
 	$('.ui-page-active').page("destroy").page();
+	$('#pollCollapsible').trigger('expand');
+	
 }
 
-function submitPoll(option)
+function submitPoll(pollName, option)
 {
+	$.mobile.loading('show');
 	console.log("Option "+option+" clicked");
-	$("#poll").html("<h3 align='center'>Submitted</h3>");	
-	$('.ui-page-active').page("destroy").page();
+	socket.emit('pollSubmission', {courseCode:sessionStorage.getItem("courseCode"), pollName:pollName, username:sessionStorage.getItem("username"), submission:option});
+		
+	socket.on('pollSubmissionComplete', function (data)
+	{
+		$.mobile.loading( 'hide');
+		if (data.success)
+		{
+			$("#poll").html("<h3 align='center'>Submitted poll \""+pollName+"\"</h3>");
+			$('.ui-page-active').page("destroy").page();
+		}
+		else
+			alert("Client has failed to submit poll");
+	});
+	
 }

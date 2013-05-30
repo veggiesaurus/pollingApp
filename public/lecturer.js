@@ -3,6 +3,11 @@ var socket;
 var newPollButton;
 var chatBox;
 
+var pollName="";
+var results=new Array(5);
+
+
+
 $( document ).bind( 'mobileinit', initFunction);
 
 function initFunction()
@@ -61,6 +66,26 @@ window.onload = function()
 		$.mobile.loading( 'hide');					
 	});
 	
+	socket.on('pushResults', function (data)
+	{
+		var dataChanged=false;
+		for (var i=0;i<results.length;i++)
+		{
+			if (results[i]!=data.results[i])
+			{
+				dataChanged=true;
+				break;
+			}
+		}
+		
+		if (!pollName || data.pollName!=pollName || dataChanged)
+		{
+			results=data.results;
+			pollName=data.pollName;
+			chartResults(data.pollName, data.results);
+		}
+	});
+	
 	
 	newPollButton.onclick = addNewPoll = function() 
 	{
@@ -94,4 +119,119 @@ function CreatePoll()
 	$.mobile.loading( 'show');
 	console.log("Creating Poll");
 	socket.emit('newPoll', {passwordMD5: sessionStorage.getItem("passwordMD5"), courseCode: sessionStorage.getItem("courseCode"), pollName: $('#pollName').val(), numOptions: $('#sliderNumoptions').val() });
+}
+
+function chartResults(pollName, results)
+{
+    //create the histogram with empty values
+	
+    var xVals=new Array(results.length);
+	for (var i=0;i<xVals.length;i++)
+		xVals[i]=i+1;
+		
+	var perShapeGradient = {
+		x1: 0,
+		y1: 0,
+		x2: 0,
+		y2: 1
+	};
+		
+		
+    chart = new Highcharts.Chart({
+        chart: {
+            borderColor: '#000000',
+            borderWidth: 2,
+            renderTo: 'resultsChart',                
+            animation: true,
+            type: 'column'
+        },            
+        title: {
+            text: 'Poll Results: '+pollName
+        },
+        subtitle: {            
+            text: 'PHY'+sessionStorage.courseCode
+        },  
+		legend: {
+            enabled: false
+        },		
+        xAxis: {
+            categories: xVals,
+            labels: {align:"center"}
+        },
+        yAxis: {
+            min: 0,
+            title: 
+			{
+                text: 'Count'
+            }
+        },
+        tooltip: 
+        {
+			enabled: false,
+            backgroundColor: 
+            {
+                linearGradient: [0, 0, 0, 60],
+                stops: [
+                [0, '#FFFFFF'],
+                [1, '#E0E0E0']
+                ]
+            },
+            borderWidth: 2,
+            borderColor: '#000',
+            style: 
+            {
+                color: '#333333',               
+                padding: '5px'
+            }
+            
+        },
+        plotOptions: 
+        {
+            series: {
+                borderWidth: 1,
+                borderColor: 'black',
+                animation: false
+            },
+            column: 
+            {
+                pointPadding: 0.05,
+                groupPadding: 0.1,
+                borderWidth: 1,
+				colorByPoint: true
+            }			
+        },		
+		colors: [{
+            linearGradient: perShapeGradient,
+            stops: [
+                [0, '#c1272d'],
+                [1, '#f1475d']
+                ]
+            }, {
+            linearGradient: perShapeGradient,
+            stops: [
+                [0, '#009245'],
+                [1, '#20a265']
+                ]
+            }, {
+			linearGradient: perShapeGradient,
+            stops: [
+                [0, '#f7931e'],
+                [1, '#f7b33e']
+                ]
+            }, {
+			linearGradient: perShapeGradient,
+            stops: [
+                [0, '#0071bc'],
+                [1, '#2091dc']
+                ]
+            }, {
+            linearGradient: perShapeGradient,
+            stops: [
+                [0, '#93278f'],
+                [1, '#b347af']
+                ]}, 
+        ],
+        series: [{name: 'Votes',data: results}]
+    });    
+    chart.redraw();    
 }

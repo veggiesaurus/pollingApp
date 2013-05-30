@@ -7,5 +7,17 @@ block content
 		div(data-theme='a',data-role='header')
 			h3 Realtime Polling
 		div(data-role='content')
-			div#poll
-		
+			div(data-role='collapsible-set', data-theme='a', data-content-theme='b')
+				#pollCollapsible(data-role='collapsible', data-collapsed='true', )
+					h3 
+						span#pollHeading
+							|No Poll
+					span#poll
+							|Waiting for a new poll
+				#resultsCollapsible(data-role='collapsible', data-collapsed='true')
+					h3 
+						span#resultsHeading
+							|No results
+					span#results
+							|Waiting for new results
+						#resultsChart(data-role='content')
