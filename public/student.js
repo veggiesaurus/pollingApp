@@ -85,7 +85,22 @@ function submitPoll(pollName, option)
 			$('.ui-page-active').page("destroy").page();
 		}
 		else
-			alert("Client has failed to submit poll");
+		{
+			if (data.reason == 'missingData')
+				$("#popupStudentErrorMessage").html("<b>Error</b>: Missing data. Refresh the page to reconnect.");
+			else if (data.reason == 'invalidPoll')
+				$("#popupStudentErrorMessage").html("<b>Error</b>: Poll is no longer open. Refresh the page to reconnect.");
+			else if (data.reason == 'outOfRange')
+				$("#popupStudentErrorMessage").html("<b>Error</b>: Poll entry is out of range. Try another option.");
+			else if (data.reason == 'duplicate')
+				$("#popupStudentErrorMessage").html("<b>Error</b>: You have already answered this poll. If you believe this is incorrect, try refreshing the page.");
+			else
+				$("#popupStudentErrorMessage").html("<b>Error</b>: An unknown error occured.");
+			
+			$( "#popupStudentError" ).popup("open");
+			//alert("Client has failed to submit poll");
+		}
+			
 	});
 	
 }

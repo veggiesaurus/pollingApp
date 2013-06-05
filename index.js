@@ -3,6 +3,7 @@ var app = express();
 var port = 3700;
 
 var mapPolls={};
+var mapClients={};
 var mapTimers={};
 var mapResults={};
 
@@ -50,9 +51,14 @@ io.sockets.on('connection', function (socket)
 	//wait for client to  tell us which course they're in, or...
 	socket.on('courseCode', function (courseCode) 
 	{
-		console.log("Client has been placed in room: "+courseCode);
+		console.log("Client (" + socket.handshake.address.address+" has been placed in room: "+courseCode);
 		socket.join(courseCode);
+		//TODO: make sure room is available!
 		socket.emit('joinedRoom', {roomName:courseCode, success: true});
+		//check if there is a current poll and the client hasn't already responsed to it
+		if (mapPolls[courseCode] && !mapPolls[courseCode].submittedClients[socket.handshake.address.address])
+			socket.emit('pushNewPoll', {pollName: mapPolls[courseCode].pollName, numOptions:mapPolls[courseCode].numOptions});
+		
 	});
 	//...authenticate as the lecturer
 	socket.on('auth', function (data) 
@@ -70,8 +76,9 @@ io.sockets.on('connection', function (socket)
 		{			
 			//emit poll to everyone else
 			console.log("Pushing new poll to students: "+data.pollName);
+			mapPolls[data.courseCode]={pollName: data.pollName, numOptions:data.numOptions, submittedClients:{}};
 			io.sockets.in(data.courseCode).emit('pushNewPoll', {pollName: data.pollName, numOptions:data.numOptions});
-
+			
 			//emit success to the lecturer
 			socket.emit('pushedNewPoll', {pollName: data.pollName, success: true});
 
@@ -81,6 +88,8 @@ io.sockets.on('connection', function (socket)
 			for (var i=0;i<results.length;i++)
 				results[i]=0;
 			mapResults[data.courseCode]={pollName:data.pollName, results:results};
+			
+			//callback timers		
 			if (mapTimers[data.courseCode])
 				clearTimeout(mapTimers[data.courseCode]);
 			mapTimers[data.courseCode]=setInterval(function()
@@ -99,19 +108,37 @@ io.sockets.on('connection', function (socket)
 	
 	socket.on('pollSubmission', function (data) 
 	{	
-		console.log("Recieved new poll reply: "+data.submission);
-		if(mapResults[data.courseCode] && data.username && data.courseCode && data.pollName==mapResults[data.courseCode].pollName && data.submission>=1 && data.submission<=mapResults[data.courseCode].results.length+1)
+		console.log("Recieved new poll reply");
+		
+		if(!data.username || !data.courseCode || !data.username || !data.submission)
 		{
-			//have to minus 1 because poll options are 1->N and array is 0->N-1
-			mapResults[data.courseCode].results[data.submission-1]++;
-			//emit success to the student
-			socket.emit('pollSubmissionComplete', {pollName: data.pollName, success: true});			
+			console.log("Invalid poll reply: missing data");
+			socket.emit('pollSubmissionComplete', {pollName: data.pollName, success: false, reason:'missingData'});
+		}
+		else if (!mapPolls[data.courseCode] || data.pollName!=mapPolls[data.courseCode].pollName)
+		{
+			console.log("Invalid poll reply: poll is not available");
+			socket.emit('pollSubmissionComplete', {pollName: data.pollName, success: false, reason:'invalidPoll'});
+		}
+		else if (data.submission<1 || data.submission>mapResults[data.courseCode].results.length+1)
+		{
+			console.log("Invalid poll reply: submission is out of range");
+			socket.emit('pollSubmissionComplete', {pollName: data.pollName, success: false, reason:'outOfRange'});
+		}
+		else if (mapPolls[data.courseCode].submittedClients[socket.handshake.address.address])
+		{
+			console.log("Invalid poll reply: client has already submitted poll response");
+			socket.emit('pollSubmissionComplete', {pollName: data.pollName, success: false, reason:'duplicate'});
 		}
 		else
 		{
-			//emit failure to student
-			socket.emit('pollSubmissionComplete', {pollName: data.pollName, success: false});
-		}
+			//have to minus 1 because poll options are 1->N and array is 0->N-1
+			mapResults[data.courseCode].results[data.submission-1]++;
+			//record IP address of those who submitted
+			mapPolls[data.courseCode].submittedClients[socket.handshake.address.address]=true;
+			//emit success to the student
+			socket.emit('pollSubmissionComplete', {pollName: data.pollName, success: true});			
+		}		
 	});
 	
 	

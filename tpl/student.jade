@@ -7,6 +7,7 @@ block content
 		div(data-theme='a',data-role='header')
 			h3 Realtime Polling
 		div(data-role='content')
+			include studentPopups
 			div(data-role='collapsible-set', data-theme='a', data-content-theme='b')
 				#pollCollapsible(data-role='collapsible', data-collapsed='true', )
 					h3 
@@ -21,3 +22,4 @@ block content
 					span#results
 							|Waiting for new results
 						#resultsChart(data-role='content')
+			

@@ -58,7 +58,7 @@ window.onload = function()
 		{
 			console.log("Poll "+data.pollName+" has been pushed to students");
 			$.mobile.loading( 'hide');
-			$( "#popupBasic" ).popup( "close" );
+			$( "#popupPoll" ).popup( "close" );
 			
 		}
 		else
@@ -89,7 +89,7 @@ window.onload = function()
 	
 	newPollButton.onclick = addNewPoll = function() 
 	{
-		$('#popupBasic').popup("open");
+		$('#popupPoll').popup("open");
 	};
 }
 
@@ -97,7 +97,7 @@ window.onload = function()
 
 $(document).ready(function() 
 {	
-	$("#popupBasic").keyup(function(e) 
+	$("#popupPoll").keyup(function(e) 
 	{
 		if(e.keyCode == 13) 
 		{
@@ -107,7 +107,7 @@ $(document).ready(function()
 });
 
 $(document).on('pagebeforeshow', '#page1', function(){ 
-    $( "#popupBasic" ).popup({
+    $( "#popupPoll" ).popup({
         afteropen: function( event, ui ) {
             $('#pollName').focus();
         }
