@@ -15,14 +15,14 @@ function initFunction()
 
 window.onload = function() 
 {
-	$.mobile.loading( 'show');
+	$.mobile.loading('show');
 	var messages = [];
 	var polls = [];
 	sessionStorage.setItem("courseCode", "1004W");
 	sessionStorage.setItem("username", "cmrang001");
 	
-	socket = io.connect(window.location.hostname);	
-
+	var host="http://"+window.location.hostname+":3700";
+	socket = io.connect(host);		
 	
 	
 	socket.on('connectionSuccess', function ()

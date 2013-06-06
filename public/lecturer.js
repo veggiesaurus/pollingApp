@@ -27,7 +27,8 @@ window.onload = function()
 	$.mobile.loading( 'show');
 	messages = [];
 	var polls = [];	
-	socket = io.connect(window.location.hostname);		
+	var host="http://"+window.location.hostname+":3700";
+	socket = io.connect(host);	
 	newPollButton = document.getElementById("btnNewPoll");
 	chatBox = document.getElementById("chatBox");	
 	
