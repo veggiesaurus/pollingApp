@@ -150,27 +150,54 @@ function chartResults(pollName, results)
             enabled: false
         },
         title: {
-            text: 'Poll Results: '+pollName
+            text: '<b>Poll Results: </b>'+pollName,
+			style:
+			{
+				fontSize: '150%'
+			}
         },
 		exporting: 
 		{
             filename: 'PHY'+sessionStorage.courseCode+'_'+pollName
         },
         subtitle: {            
-            text: 'PHY'+sessionStorage.courseCode
+            text: 'PHY'+sessionStorage.courseCode,
+			style:
+			{
+				fontSize: '150%'
+			}
         },  
 		legend: {
             enabled: false
         },		
         xAxis: {
             categories: xVals,
-            labels: {align:"center"}
+            labels: 
+			{
+				align:"center", 
+				overflow: 'justify',
+				y:25,
+				style: 
+				{
+					fontSize: '150%'
+				}
+			}			
         },
         yAxis: {
             min: 0,
             title: 
 			{
-                text: 'Count'
+                text: 'Count',
+				style:
+				{
+					fontSize: '150%'
+				}
+				
+            },
+			labels: {
+                style: {
+                    fontSize: '150%'
+                }
             }
         },
         tooltip: 
