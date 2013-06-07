@@ -145,7 +145,10 @@ function chartResults(pollName, results)
             renderTo: 'resultsChart',                
             animation: true,
             type: 'column'
-        },            
+        }, 
+		credits: {
+            enabled: false
+        },
         title: {
             text: 'Poll Results: '+pollName
         },
