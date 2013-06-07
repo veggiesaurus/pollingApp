@@ -149,6 +149,10 @@ function chartResults(pollName, results)
         title: {
             text: 'Poll Results: '+pollName
         },
+		exporting: 
+		{
+            filename: 'PHY'+sessionStorage.courseCode+'_'+pollName
+        },
         subtitle: {            
             text: 'PHY'+sessionStorage.courseCode
         },  
