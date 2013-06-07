@@ -1,7 +1,8 @@
 extends layout
 block headerScripts
 	script(src='/poll/lecturer.js')
-	
+	script
+		room="#{room}";
 block content
 	div#page1(data-role='page')
 		div(data-theme='a',data-role='header')

@@ -18,7 +18,8 @@ window.onload = function()
 	$.mobile.loading('show');
 	var messages = [];
 	var polls = [];
-	sessionStorage.setItem("courseCode", "1004W");
+	//room variable comes from jade parameter (server-sent)
+	sessionStorage.setItem("courseCode", room);
 	sessionStorage.setItem("username", "cmrang001");
 	
 	var host="http://"+window.location.hostname+":3700";

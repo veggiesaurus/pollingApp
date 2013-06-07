@@ -15,13 +15,23 @@ app.set('view engine', "jade");
 app.engine('jade', require('jade').__express);
 app.use(express.static(__dirname + '/public'));
 
+app.get("/lecView/:id([0-9]+):courseType(w|h|s)(\/(:sub([0-9])))?", function(req, res)
+{
+	console.log(req.params);
+	res.render("lecturer", {room:req.params.id+req.params.courseType+(req.params.sub?req.params.sub:"")});
+});
+
+
+app.get("/:id([0-9]+):courseType(w|h|s)(\/(:sub([0-9])))?", function(req, res){	
+	res.render("student", {room:req.params.id+req.params.courseType+(req.params.sub?req.params.sub:"")});
+	
+});
+
+
 app.get("/", function(req, res){
 	res.render("student");
 });
 
-app.get("/lecView", function(req, res){
-	res.render("lecturer");
-});
 
 var io = require('socket.io').listen(app.listen(port));
 io.set('log level', 5);                    // reduce logging
@@ -51,6 +61,7 @@ io.sockets.on('connection', function (socket)
 	//wait for client to  tell us which course they're in, or...
 	socket.on('courseCode', function (courseCode) 
 	{
+		courseCode=courseCode.toUpperCase();
 		console.log("Client (" + socket.handshake.address.address+" has been placed in room: "+courseCode);
 		socket.join(courseCode);
 		//TODO: make sure room is available!
@@ -63,6 +74,7 @@ io.sockets.on('connection', function (socket)
 	//...authenticate as the lecturer
 	socket.on('auth', function (data) 
 	{	
+		data.courseCode=data.courseCode.toUpperCase();
 		console.log("Lecturer has authenticated and been placed in room: "+data.courseCode+"_admin");
 		socket.join(data.courseCode+"_admin");
 		socket.emit('authComplete', {courseCode:data.courseCode, success: true});

@@ -32,7 +32,7 @@ window.onload = function()
 	newPollButton = document.getElementById("btnNewPoll");
 	chatBox = document.getElementById("chatBox");	
 	
-	sessionStorage.setItem("courseCode", "1004W");
+	sessionStorage.setItem("courseCode", room);
 	//dummy password for now (md5("test"))
 	sessionStorage.setItem("passwordMD5", "098f6bcd4621d373cade4e832627b4f6");
 	
