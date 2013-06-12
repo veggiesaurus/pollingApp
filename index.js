@@ -83,7 +83,9 @@ io.sockets.on('connection', function (socket)
 	socket.on('newPoll', function (data) 
 	{	
 		console.log("Recieved new poll: "+data);
-		
+		if (data.courseCode)
+			data.courseCode=data.courseCode.toUpperCase();
+			
 		if(data.passwordMD5==passwordMD5 && data.pollName && data.courseCode)
 		{			
 			//emit poll to everyone else
@@ -120,6 +122,8 @@ io.sockets.on('connection', function (socket)
 	
 	socket.on('pollSubmission', function (data) 
 	{	
+		if (data.courseCode)
+			data.courseCode=data.courseCode.toUpperCase();
 		console.log("Recieved new poll reply");
 		
 		if(!data.username || !data.courseCode || !data.username || !data.submission)
