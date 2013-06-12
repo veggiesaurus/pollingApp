@@ -19,7 +19,7 @@ window.onload = function()
 	var messages = [];
 	var polls = [];
 	//room variable comes from jade parameter (server-sent)
-	sessionStorage.setItem("courseCode", room);
+	sessionStorage.setItem("courseCode", room.toUpperCase());
 	sessionStorage.setItem("username", "cmrang001");
 	
 	var host="http://"+window.location.hostname+":3700";

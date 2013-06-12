@@ -15,14 +15,14 @@ app.set('view engine', "jade");
 app.engine('jade', require('jade').__express);
 app.use(express.static(__dirname + '/public'));
 
-app.get("/lecView/:id([0-9]+):courseType(w|h|s)(\/(:sub([0-9])))?", function(req, res)
+app.get("/lecView/:id([0-9]+):courseType(w|f|h|s)(\/(:sub([0-9])))?", function(req, res)
 {
 	console.log(req.params);
 	res.render("lecturer", {room:req.params.id+req.params.courseType+(req.params.sub?req.params.sub:"")});
 });
 
 
-app.get("/:id([0-9]+):courseType(w|h|s)(\/(:sub([0-9])))?", function(req, res){	
+app.get("/:id([0-9]+):courseType(w|f|h|s)(\/(:sub([0-9])))?", function(req, res){	
 	res.render("student", {room:req.params.id+req.params.courseType+(req.params.sub?req.params.sub:"")});
 	
 });
