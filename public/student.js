@@ -1,6 +1,7 @@
 var socket;
 
 $( document ).bind( 'mobileinit', initFunction);
+if (!window.console) console = {log: function() {}};
 
 function initFunction()
 {
