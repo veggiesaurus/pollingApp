@@ -2,10 +2,11 @@ var messages;
 var socket;
 var newPollButton;
 var chatBox;
-
+var salt;
 var pollName="";
 var results=new Array(5);
-
+var polls;		
+var host;
 
 
 $( document ).bind( 'mobileinit', initFunction);
@@ -26,33 +27,35 @@ function initFunction()
 
 window.onload = function() 
 {	
+	$('#authError').hide();
+	$('#popupAuth').popup("open");
 	$.mobile.loading( 'show');
 	messages = [];
-	var polls = [];	
-	var host="http://"+window.location.hostname+":3700";
-	socket = io.connect(host);	
-	newPollButton = document.getElementById("btnNewPoll");
-	chatBox = document.getElementById("chatBox");	
-	
+	polls = [];		
+	host="http://"+window.location.hostname+":3700";
 	sessionStorage.setItem("courseCode", room.toUpperCase());
-	//dummy password for now (md5("test"))
-	sessionStorage.setItem("passwordMD5", "098f6bcd4621d373cade4e832627b4f6");
+	newPollButton = document.getElementById("btnNewPoll");
 	
-	
-	socket.on('connectionSuccess', function ()
+	socket = io.connect(host);	
+	socket.on('connectionSuccess', function (data)
 	{
-		
-		console.log("Connected to server, sending course code");
-		socket.emit('auth', {passwordMD5: sessionStorage.getItem("passwordMD5"), courseCode: sessionStorage.getItem("courseCode")});
+		salt=data.salt;
+		console.log("Connected to server");		
 	});
 	
 	socket.on('authComplete', function (data)
 	{
 		$.mobile.loading( 'hide');
 		if (data.success)
+		{
 			console.log("Lecturer has authenticated");
+			$('#popupAuth').popup("close");
+		}
 		else
+		{
 			console.log("Lecturer has failed to be authenticated");
+			$('#authError').slideDown();
+		}
 	});
 	
 	socket.on('pushedNewPoll', function (data)
@@ -93,7 +96,19 @@ window.onload = function()
 	newPollButton.onclick = addNewPoll = function() 
 	{
 		$('#popupPoll').popup("open");
-	};
+	};	
+}
+
+function SendAuth()
+{		
+	sessionStorage.setItem("passwordMD5", hex_md5($('#password').val()));
+	
+	var unhashedSalt=sessionStorage.getItem("passwordMD5")+salt;
+	console.log("Unhashed salt: "+unhashedSalt);
+	//todo: md5 it!
+	var saltedHash=hex_md5(unhashedSalt);
+	console.log("Salted Hash: "+saltedHash);
+	socket.emit('auth', {passwordMD5: saltedHash, courseCode: sessionStorage.getItem("courseCode")});
 }
 
 
@@ -109,19 +124,42 @@ $(document).ready(function()
 	});
 });
 
-$(document).on('pagebeforeshow', '#page1', function(){ 
-    $( "#popupPoll" ).popup({
+$(document).ready(function() 
+{	
+	$("#popupAuth").keyup(function(e) 
+	{
+		if(e.keyCode == 13) 
+		{
+			SendAuth();
+		}
+	});
+});
+
+$(document).on('pagebeforeshow', '#page1', function()
+{ 
+    $( "#popupAuth" ).popup({
         afteropen: function( event, ui ) {
             $('#pollName').focus();
         }
     });
+	
+	$( "#popupPoll" ).popup({
+        afteropen: function( event, ui ) {
+            $('#pollName').focus();
+        }
+    });	
 });
 
 function CreatePoll()
 {
 	$.mobile.loading( 'show');
 	console.log("Creating Poll");
-	socket.emit('newPoll', {passwordMD5: sessionStorage.getItem("passwordMD5"), courseCode: sessionStorage.getItem("courseCode"), pollName: $('#pollName').val(), numOptions: $('#sliderNumoptions').val() });
+	var unhashedSalt=sessionStorage.getItem("passwordMD5")+salt;
+	console.log("Unhashed salt: "+unhashedSalt);
+	//todo: md5 it!
+	var saltedHash=hex_md5(unhashedSalt);
+	console.log("Salted Hash: "+saltedHash);
+	socket.emit('newPoll', {passwordMD5: saltedHash, courseCode: sessionStorage.getItem("courseCode"), pollName: $('#pollName').val(), numOptions: $('#sliderNumoptions').val() });
 }
 
 function chartResults(pollName, results)

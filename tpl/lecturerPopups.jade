@@ -1,4 +1,4 @@
-#popupPoll(data-role='popup', data-position-to='#name', data-transition='fade', class='ui-content', style='max-width:280px')
+#popupPoll(data-role='popup', data-position-to='#btnNewPoll', data-transition='fade', class='ui-content', style='max-width:280px')
 	a.ui-btn-right(href='#', data-rel='back', data-role='button', data-theme='a', data-icon='delete', data-iconpos='notext') Close
 	p
 		input#pollName(placeholder="Poll Name")
@@ -6,3 +6,11 @@
 		input#sliderNumoptions(type='range', name='sliderNumoptions', value='3', min='2', max='5', data-highlight="true")
 		a#btnAcceptPoll(data-role='button',data-mini="true", onclick="CreatePoll();") Create
 		a#btnCancelPoll(data-rel="back", data-role="button", data-theme="b", data-transition="fade", data-mini="true") Cancel
+
+#popupAuth(data-role='popup', data-dismissible="true", data-position-to='#btnNewPoll', data-transition='fade', class='ui-content', style='max-width:280px')
+	p
+		input#password(type="password",placeholder="Password")
+		a#btnAcceptPoll(data-role='button',data-mini="true", onclick="SendAuth();")
+			|Login
+		a#authError(align="center")
+			|Authentication error

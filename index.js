@@ -6,13 +6,14 @@ var mapPolls={};
 var mapClients={};
 var mapTimers={};
 var mapResults={};
-
+var mapSalts={};
 //hard coded for now
 var passwordMD5="098f6bcd4621d373cade4e832627b4f6";
 
 app.set('views', __dirname + '/tpl');
 app.set('view engine', "jade");
 app.engine('jade', require('jade').__express);
+app.set('view options', { pretty: true });
 app.use(express.static(__dirname + '/public'));
 
 app.get("/lecView/:id([0-9]+):courseType(w|f|h|s)(\/(:sub([0-9])))?", function(req, res)
@@ -32,7 +33,7 @@ app.get("/", function(req, res){
 	res.render("student");
 });
 
-
+var crypto = require('crypto');
 var io = require('socket.io').listen(app.listen(port));
 io.set('log level', 5);                    // reduce logging
 //production settings
@@ -57,7 +58,10 @@ io.set('transports', [
 io.sockets.on('connection', function (socket) 
 {
 	console.log("Client connected. Waiting for course code or auth");
-	socket.emit('connectionSuccess');
+	//temp testing: salt 100
+	//mapSalts[socket.id]=100;
+	mapSalts[socket.id]=Math.floor((Math.random()*2000000)+1);
+	socket.emit('connectionSuccess', {salt:mapSalts[socket.id]});
 	//wait for client to  tell us which course they're in, or...
 	socket.on('courseCode', function (courseCode) 
 	{
@@ -73,11 +77,24 @@ io.sockets.on('connection', function (socket)
 	});
 	//...authenticate as the lecturer
 	socket.on('auth', function (data) 
-	{	
-		data.courseCode=data.courseCode.toUpperCase();
-		console.log("Lecturer has authenticated and been placed in room: "+data.courseCode+"_admin");
-		socket.join(data.courseCode+"_admin");
-		socket.emit('authComplete', {courseCode:data.courseCode, success: true});
+	{		
+		var unhashedSalt=passwordMD5+mapSalts[socket.id];
+		console.log("Unhashed salt: "+unhashedSalt);
+		//todo: md5 it!
+		var saltedHash=crypto.createHash('md5').update(unhashedSalt).digest("hex");
+		console.log("Salted Hash: "+saltedHash);
+		if (data.passwordMD5==saltedHash)
+		{
+			data.courseCode=data.courseCode.toUpperCase();
+			console.log("Lecturer has authenticated and been placed in room: "+data.courseCode+"_admin");
+			socket.join(data.courseCode+"_admin");
+			socket.emit('authComplete', {courseCode:data.courseCode, success: true});
+		}
+		else
+		{
+			console.log("Authentication error");
+			socket.emit('authComplete', {courseCode:data.courseCode, success: false});
+		}
 	});	
 		
 	socket.on('newPoll', function (data) 
@@ -85,8 +102,8 @@ io.sockets.on('connection', function (socket)
 		console.log("Recieved new poll: "+data);
 		if (data.courseCode)
 			data.courseCode=data.courseCode.toUpperCase();
-			
-		if(data.passwordMD5==passwordMD5 && data.pollName && data.courseCode)
+		var saltedHash=crypto.createHash('md5').update(passwordMD5+mapSalts[socket.id]).digest("hex");
+		if(data.passwordMD5==saltedHash && data.pollName && data.courseCode)
 		{			
 			//emit poll to everyone else
 			console.log("Pushing new poll to students: "+data.pollName);

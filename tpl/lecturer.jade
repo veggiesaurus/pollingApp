@@ -1,15 +1,16 @@
 extends layout
 block headerScripts
-	script(src='/poll/lecturer.js')
+
+	script(src='/poll/util/md5-min.js')
+	script(src='/poll/lecturer.js')	
 	script
 		room="#{room}";
 block content
 	div#page1(data-role='page')
 		div(data-theme='a',data-role='header')
-			h3 Real Time Polling (Lecturer View)
+			h3 UCT PhysPoll (Lecturer)
 		div(data-role='content')
 			#resultsChart(data-role='content')
-			a#btnNewPoll(data-role='button') Create new poll
-			a#btnNewPoll(data-role='button',visible=false) Close current poll
+			a#btnNewPoll(data-role='button') Create new poll			
 			include lecturerPopups
 		
