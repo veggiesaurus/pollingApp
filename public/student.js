@@ -59,8 +59,8 @@ function displayPollOptions(pollName, numOptions)
 {
 	$("#pollHeading").html("Current Poll: "+pollName);	
 	var optionsHtml="";
-	//have to minus 1 because poll options are 1->N and array is 0->N-1
-	var swatch=["f", "g", "h", "i", "j"];
+	//colour fix for 1031S slides jumbles up swatches a little
+	var swatch=["f", "g", "i", "a", "h"];
 	for (var i=0;i<numOptions;i++)
 	{
 		optionsHtml+="<a data-role='button' data-transition='fade' data-theme='"+swatch[i]+"' onclick='submitPoll(\""+pollName+"\" ,"+(i+1)+");'>Option "+(i+1)+"</a>"

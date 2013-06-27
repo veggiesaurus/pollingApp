@@ -316,23 +316,23 @@ function chartResults(pollName, results)
                 [0, '#009245'],
                 [1, '#20a265']
                 ]
-            }, {
-			linearGradient: perShapeGradient,
-            stops: [
-                [0, '#f7931e'],
-                [1, '#f7b33e']
-                ]
-            }, {
+            }, {			
 			linearGradient: perShapeGradient,
             stops: [
                 [0, '#0071bc'],
                 [1, '#2091dc']
                 ]
             }, {
+			linearGradient: perShapeGradient,
+            stops: [
+                [0, '#03070f'],
+                [1, '#03070f']
+                ]
+            }, {
             linearGradient: perShapeGradient,
             stops: [
-                [0, '#93278f'],
-                [1, '#b347af']
+                [0, '#f7931e'],
+                [1, '#f7b33e']				
                 ]}, 
         ],
         series: [{name: 'Votes',data: results}]
