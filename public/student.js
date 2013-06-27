@@ -21,7 +21,6 @@ window.onload = function()
 	var polls = [];
 	//room variable comes from jade parameter (server-sent)
 	sessionStorage.setItem("courseCode", room.toUpperCase());
-	sessionStorage.setItem("username", "cmrang001");
 	
 	var host="http://"+window.location.hostname+":3700";
 	socket = io.connect(host);		
@@ -66,10 +65,10 @@ function displayPollOptions(pollName, numOptions)
 	{
 		optionsHtml+="<a data-role='button' data-transition='fade' data-theme='"+swatch[i]+"' onclick='submitPoll(\""+pollName+"\" ,"+(i+1)+");'>Option "+(i+1)+"</a>"
 	}
-	$("#poll").html(optionsHtml);		
-	$('.ui-page-active').page("destroy").page();
 	$('#pollCollapsible').trigger('expand');
-	
+	$("#poll").html(optionsHtml);			
+	$('.ui-page-active').page("destroy").page();		
+	$("#pollCollapsible").slideDown();
 }
 
 function submitPoll(pollName, option)
@@ -98,9 +97,8 @@ function submitPoll(pollName, option)
 				$("#popupStudentErrorMessage").html("<b>Error</b>: You have already answered this poll. If you believe this is incorrect, try refreshing the page.");
 			else
 				$("#popupStudentErrorMessage").html("<b>Error</b>: An unknown error occured.");
-			
+				
 			$( "#popupStudentError" ).popup("open");
-			//alert("Client has failed to submit poll");
 		}
 			
 	});
