@@ -7,8 +7,8 @@ var mapClients={};
 var mapTimers={};
 var mapResults={};
 var mapSalts={};
-//hard coded for now
-var passwordMD5="098f6bcd4621d373cade4e832627b4f6";
+//hard coded for now, protected by salt
+var passwordMD5="99f695a9e1d5ee3f49cabd01750986e2";
 
 app.set('views', __dirname + '/tpl');
 app.set('view engine', "jade");
@@ -63,6 +63,7 @@ io.sockets.on('connection', function (socket)
 	mapSalts[socket.id]=Math.floor((Math.random()*2000000)+1);
 	socket.emit('connectionSuccess', {salt:mapSalts[socket.id]});
 	//wait for client to  tell us which course they're in, or...
+	
 	socket.on('courseCode', function (courseCode) 
 	{
 		courseCode=courseCode.toUpperCase();
@@ -123,11 +124,12 @@ io.sockets.on('connection', function (socket)
 			//callback timers		
 			if (mapTimers[data.courseCode])
 				clearTimeout(mapTimers[data.courseCode]);
-			mapTimers[data.courseCode]=setInterval(function()
+			mapTimers[data.courseCode]=setInterval(pushResults=function()
 			{	
 				console.log("Pushing results of poll \""+mapResults[data.courseCode].pollName+"\"to lecturer");
 				io.sockets.in(data.courseCode+"_admin").emit('pushResults', mapResults[data.courseCode]);
 			}, 2000);
+			pushResults();
 		}
 		else
 		{

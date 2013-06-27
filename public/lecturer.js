@@ -7,7 +7,8 @@ var pollName="";
 var results=new Array(5);
 var polls;		
 var host;
-
+var loggedIn=false;
+var firstUpdate=true;
 
 $( document ).bind( 'mobileinit', initFunction);
 if (!window.console) console = {log: function() {}};
@@ -21,26 +22,63 @@ function initFunction()
     $.mobile.loader.prototype.options.text = "Loading";
     $.mobile.loader.prototype.options.textVisible = true;
     $.mobile.loader.prototype.options.theme = "a";
-    $.mobile.loader.prototype.options.html = "";  
+    $.mobile.loader.prototype.options.html = "";  	
+	$.mobile.loading( 'show');	
 }
 
 
 window.onload = function() 
 {	
+	location.hash="";
 	$('#authError').hide();
-	$('#popupAuth').popup("open");
+	$("#btnNewPoll").addClass('ui-disabled');	
 	$.mobile.loading( 'show');
 	messages = [];
-	polls = [];		
+	polls = [];	
 	host="http://"+window.location.hostname+":3700";
 	sessionStorage.setItem("courseCode", room.toUpperCase());
+	
+	openLoginButton = document.getElementById("btnOpenLogin");
+	
+	
+	openLoginButton.onclick = openLogin = function() 
+	{			
+		$('#popupAuth').popup("open");
+	};	
+	
+	loginButton = document.getElementById("btnLogin");
+	loginButton.onclick = login = function() 
+	{
+		sessionStorage.setItem("passwordMD5", hex_md5($("#password").val()));	
+		var unhashedSalt=sessionStorage.getItem("passwordMD5")+salt;
+		console.log("Unhashed salt: "+unhashedSalt);		
+		var saltedHash=hex_md5(unhashedSalt);
+		console.log("Salted Hash: "+saltedHash);
+		socket.emit('auth', {passwordMD5: saltedHash, courseCode: sessionStorage.getItem("courseCode")});
+		$.mobile.loading( 'show');		
+	};
+	
 	newPollButton = document.getElementById("btnNewPoll");
+		
+	newPollButton.onclick = addNewPoll = function() 
+	{	
+		if (!loggedIn)
+			return;
+		var now = new Date();		
+		var proposedName=now.format("m_dd_HH_MM");
+		//if the previous poll is already called that
+		if (proposedName==pollName)
+			proposedName+="_alt";
+		$("#pollName").attr("value", proposedName);
+		$('#popupPoll').popup("open");
+	};	
 	
 	socket = io.connect(host);	
 	socket.on('connectionSuccess', function (data)
 	{
 		salt=data.salt;
-		console.log("Connected to server");		
+		console.log("Connected to server");
+		$.mobile.loading( 'hide');
 	});
 	
 	socket.on('authComplete', function (data)
@@ -48,13 +86,19 @@ window.onload = function()
 		$.mobile.loading( 'hide');
 		if (data.success)
 		{
-			console.log("Lecturer has authenticated");
-			$('#popupAuth').popup("close");
+			$('#authError').slideUp();
+			
+			console.log("Lecturer has authenticated");			
+			$('#popupAuth').popup("close");			
+			$("#btnNewPoll").removeClass('ui-disabled');			
+			$("#btnOpenLogin").slideUp();
+			loggedIn=true;
 		}
 		else
 		{
 			console.log("Lecturer has failed to be authenticated");
 			$('#authError').slideDown();
+			loggedIn=false;
 		}
 	});
 	
@@ -65,6 +109,8 @@ window.onload = function()
 			console.log("Poll "+data.pollName+" has been pushed to students");
 			$.mobile.loading( 'hide');
 			$( "#popupPoll" ).popup( "close" );
+			$('#resultsChart').slideUp();			
+			firstUpdate=true;
 			
 		}
 		else
@@ -89,28 +135,15 @@ window.onload = function()
 			results=data.results;
 			pollName=data.pollName;
 			chartResults(data.pollName, data.results);
-		}
+			if (firstUpdate)
+			{	
+				$('#resultsChart').hide();
+				$('#resultsChart').slideDown();
+				firstUpdate=false;
+			}
+		}		
 	});
-	
-	
-	newPollButton.onclick = addNewPoll = function() 
-	{
-		$('#popupPoll').popup("open");
-	};	
 }
-
-function SendAuth()
-{		
-	sessionStorage.setItem("passwordMD5", hex_md5($('#password').val()));
-	
-	var unhashedSalt=sessionStorage.getItem("passwordMD5")+salt;
-	console.log("Unhashed salt: "+unhashedSalt);
-	//todo: md5 it!
-	var saltedHash=hex_md5(unhashedSalt);
-	console.log("Salted Hash: "+saltedHash);
-	socket.emit('auth', {passwordMD5: saltedHash, courseCode: sessionStorage.getItem("courseCode")});
-}
-
 
 
 $(document).ready(function() 
@@ -122,30 +155,28 @@ $(document).ready(function()
 			CreatePoll();
 		}
 	});
-});
-
-$(document).ready(function() 
-{	
+	
 	$("#popupAuth").keyup(function(e) 
 	{
 		if(e.keyCode == 13) 
 		{
-			SendAuth();
+			login();
 		}
 	});
 });
 
 $(document).on('pagebeforeshow', '#page1', function()
-{ 
-    $( "#popupAuth" ).popup({
-        afteropen: function( event, ui ) {
-            $('#pollName').focus();
-        }
-    });
-	
+{ 	
 	$( "#popupPoll" ).popup({
-        afteropen: function( event, ui ) {
+        afteropen: function( event, ui ) 
+		{
             $('#pollName').focus();
+			$('#pollName').select();
+        }
+    });	
+	$( "#popupAuth" ).popup({
+        afteropen: function( event, ui ) {
+            $('#password').focus();
         }
     });	
 });
@@ -156,7 +187,6 @@ function CreatePoll()
 	console.log("Creating Poll");
 	var unhashedSalt=sessionStorage.getItem("passwordMD5")+salt;
 	console.log("Unhashed salt: "+unhashedSalt);
-	//todo: md5 it!
 	var saltedHash=hex_md5(unhashedSalt);
 	console.log("Salted Hash: "+saltedHash);
 	socket.emit('newPoll', {passwordMD5: saltedHash, courseCode: sessionStorage.getItem("courseCode"), pollName: $('#pollName').val(), numOptions: $('#sliderNumoptions').val() });
@@ -164,8 +194,7 @@ function CreatePoll()
 
 function chartResults(pollName, results)
 {
-    //create the histogram with empty values
-	
+    //create the histogram with empty values	
     var xVals=new Array(results.length);
 	for (var i=0;i<xVals.length;i++)
 		xVals[i]=i+1;
@@ -308,5 +337,5 @@ function chartResults(pollName, results)
         ],
         series: [{name: 'Votes',data: results}]
     });    
-    chart.redraw();    
+    chart.redraw();	
 }

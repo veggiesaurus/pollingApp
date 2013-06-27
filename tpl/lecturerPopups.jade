@@ -1,16 +1,15 @@
-#popupPoll(data-role='popup', data-position-to='#btnNewPoll', data-transition='fade', class='ui-content', style='max-width:280px')
-	a.ui-btn-right(href='#', data-rel='back', data-role='button', data-theme='a', data-icon='delete', data-iconpos='notext') Close
+#popupPoll(href="#popupPoll", data-role='popup', data-transition="flow", data-position-to='#btnNewPoll', class='ui-content', style='max-width:280px')	
 	p
 		input#pollName(placeholder="Poll Name")
 		label(for='sliderNumoptions') How many options:
-		input#sliderNumoptions(type='range', name='sliderNumoptions', value='3', min='2', max='5', data-highlight="true")
-		a#btnAcceptPoll(data-role='button',data-mini="true", onclick="CreatePoll();") Create
-		a#btnCancelPoll(data-rel="back", data-role="button", data-theme="b", data-transition="fade", data-mini="true") Cancel
+		input#sliderNumoptions(type='range', name='sliderNumoptions', value='3', min='2', max='5', data-highlight="true")		
+		a#btnAcceptPoll(data-role='button',data-mini="true",data-theme="b", onclick="CreatePoll();") Create
+		a#btnCancelPoll(data-role="button", data-theme="e", data-transition="fade", data-mini="true", onclick="$('#popupPoll').popup('close');") Cancel
 
-#popupAuth(data-role='popup', data-dismissible="true", data-position-to='#btnNewPoll', data-transition='fade', class='ui-content', style='max-width:280px')
+#popupAuth(href="#popupAuth", data-role='popup', data-dismissible="false", data-transition='flow', class='ui-content', style='max-width:280px')
 	p
 		input#password(type="password",placeholder="Password")
-		a#btnAcceptPoll(data-role='button',data-mini="true", onclick="SendAuth();")
+		a#btnLogin(data-role='button',data-theme="b",data-mini="true")
 			|Login
-		a#authError(align="center")
-			|Authentication error
+		a#authError(class="ui-body ui-body-e", align="center")
+				|Authentication error
