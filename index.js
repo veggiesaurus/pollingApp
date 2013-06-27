@@ -37,7 +37,7 @@ var crypto = require('crypto');
 var io = require('socket.io').listen(app.listen(port));
 io.set('log level', 5);                    // reduce logging
 //production settings
-/*
+
 io.enable('browser client minification');  // send minified client
 io.enable('browser client etag');          // apply etag caching logic based on version number
 io.enable('browser client gzip');          // gzip the file
@@ -53,13 +53,11 @@ io.set('transports', [
   , 'xhr-polling'
   , 'jsonp-polling'
 ]);
-*/
+
 
 io.sockets.on('connection', function (socket) 
 {
 	console.log("Client connected. Waiting for course code or auth");
-	//temp testing: salt 100
-	//mapSalts[socket.id]=100;
 	mapSalts[socket.id]=Math.floor((Math.random()*2000000)+1);
 	socket.emit('connectionSuccess', {salt:mapSalts[socket.id]});
 	//wait for client to  tell us which course they're in, or...
