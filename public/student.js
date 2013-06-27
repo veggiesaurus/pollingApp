@@ -16,6 +16,7 @@ function initFunction()
 
 window.onload = function() 
 {
+	location.hash="";
 	$.mobile.loading('show');
 	var messages = [];
 	var polls = [];
@@ -24,8 +25,7 @@ window.onload = function()
 	
 	var host="http://"+window.location.hostname+":3700";
 	socket = io.connect(host);		
-	
-	
+		
 	socket.on('connectionSuccess', function ()
 	{
 		console.log("Connected to server, sending course code");

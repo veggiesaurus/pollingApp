@@ -37,7 +37,7 @@ var crypto = require('crypto');
 var io = require('socket.io').listen(app.listen(port));
 io.set('log level', 5);                    // reduce logging
 //production settings
-
+/*
 io.enable('browser client minification');  // send minified client
 io.enable('browser client etag');          // apply etag caching logic based on version number
 io.enable('browser client gzip');          // gzip the file
@@ -53,7 +53,7 @@ io.set('transports', [
   , 'xhr-polling'
   , 'jsonp-polling'
 ]);
-
+*/
 
 io.sockets.on('connection', function (socket) 
 {
@@ -146,7 +146,7 @@ io.sockets.on('connection', function (socket)
 			data.courseCode=data.courseCode.toUpperCase();
 		console.log("Recieved new poll reply");
 		
-		if(!data.username || !data.courseCode || !data.username || !data.submission)
+		if(!data.courseCode || !data.pollName || !data.submission)
 		{
 			console.log("Invalid poll reply: missing data");
 			socket.emit('pollSubmissionComplete', {pollName: data.pollName, success: false, reason:'missingData'});
