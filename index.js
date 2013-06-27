@@ -69,7 +69,6 @@ io.sockets.on('connection', function (socket)
 		courseCode=courseCode.toUpperCase();
 		console.log("Client (" + socket.handshake.address.address+" has been placed in room: "+courseCode);
 		socket.join(courseCode);
-		//TODO: make sure room is available!
 		socket.emit('joinedRoom', {roomName:courseCode, success: true});
 		//check if there is a current poll and the client hasn't already responsed to it
 		if (mapPolls[courseCode] && !mapPolls[courseCode].submittedClients[socket.handshake.address.address])
@@ -81,7 +80,6 @@ io.sockets.on('connection', function (socket)
 	{		
 		var unhashedSalt=passwordMD5+mapSalts[socket.id];
 		console.log("Unhashed salt: "+unhashedSalt);
-		//todo: md5 it!
 		var saltedHash=crypto.createHash('md5').update(unhashedSalt).digest("hex");
 		console.log("Salted Hash: "+saltedHash);
 		if (data.passwordMD5==saltedHash)
@@ -105,7 +103,12 @@ io.sockets.on('connection', function (socket)
 			data.courseCode=data.courseCode.toUpperCase();
 		var saltedHash=crypto.createHash('md5').update(passwordMD5+mapSalts[socket.id]).digest("hex");
 		if(data.passwordMD5==saltedHash && data.pollName && data.courseCode)
-		{			
+		{
+		
+			//in case the socket has been disconnected since last time, put the lecturer back in the right room
+			data.courseCode=data.courseCode.toUpperCase();
+			socket.join(data.courseCode+"_admin");
+			
 			//emit poll to everyone else
 			console.log("Pushing new poll to students: "+data.pollName);
 			mapPolls[data.courseCode]={pollName: data.pollName, numOptions:data.numOptions, submittedClients:{}};
