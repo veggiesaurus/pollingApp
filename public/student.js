@@ -47,6 +47,7 @@ window.onload = function()
 		{
 			console.log("Current poll: ", data.pollName+". Number of options: "+data.numOptions);
 			displayPollOptions(data.pollName, data.numOptions);
+			$( "#popupStudentError" ).popup("close");
 		} 
 		else 
 		{
