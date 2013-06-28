@@ -57,7 +57,8 @@ window.onload = function()
 		socket.emit('auth', {passwordMD5: saltedHash, courseCode: sessionStorage.getItem("courseCode")});
 		$.mobile.loading( 'show');		
 	};
-	
+	updateButton = document.getElementById("btnUpdate");
+	updateButton.onclick = login;
 	newPollButton = document.getElementById("btnNewPoll");
 		
 	newPollButton.onclick = addNewPoll = function() 
@@ -91,6 +92,7 @@ window.onload = function()
 			console.log("Lecturer has authenticated");			
 			$('#popupAuth').popup("close");			
 			$("#btnNewPoll").removeClass('ui-disabled');			
+			$("#btnUpdate").removeClass('ui-disabled');
 			$("#btnOpenLogin").slideUp();
 			loggedIn=true;
 		}
