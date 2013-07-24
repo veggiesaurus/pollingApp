@@ -29,14 +29,19 @@ window.onload = function()
 	socket.on('connectionSuccess', function ()
 	{
 		console.log("Connected to server, sending course code");
-		socket.emit('courseCode', sessionStorage.getItem("courseCode"));
+		var existingUuid=localStorage.getItem("polling_uuid");		
+		socket.emit('courseCode', {courseCode:sessionStorage.getItem("courseCode"), uuid:existingUuid});		
 	});
 	
 	socket.on('joinedRoom', function (data)
 	{
 		$.mobile.loading( 'hide');
 		if (data.success)
+		{
 			console.log("Client has been placed in the "+data.roomName+" room");
+			console.log("polling_uuid: "+ data.uuid);
+			localStorage.setItem("polling_uuid", data.uuid);
+		}
 		else
 			console.log("Client has failed to join room");
 	});
@@ -76,7 +81,7 @@ function submitPoll(pollName, option)
 {
 	$.mobile.loading('show');
 	console.log("Option "+option+" clicked");
-	socket.emit('pollSubmission', {courseCode:sessionStorage.getItem("courseCode"), pollName:pollName, username:sessionStorage.getItem("username"), submission:option});
+	socket.emit('pollSubmission', {courseCode:sessionStorage.getItem("courseCode"), pollName:pollName, uuid:localStorage.getItem("polling_uuid"), submission:option});
 		
 	socket.on('pollSubmissionComplete', function (data)
 	{

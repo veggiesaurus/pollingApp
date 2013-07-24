@@ -1,7 +1,7 @@
 var express = require("express");
 var app = express();
 var port = 3700;
-
+var uuidCounter=1040;
 var mapPolls={};
 var mapClients={};
 var mapTimers={};
@@ -34,11 +34,13 @@ app.get("/", function(req, res){
 });
 
 var crypto = require('crypto');
+var shortId = require('shortid');
 var io = require('socket.io').listen(app.listen(port));
 io.set('log level', 5);                    // reduce logging
 //production settings
-/*
+
 io.enable('browser client minification');  // send minified client
+/*
 io.enable('browser client etag');          // apply etag caching logic based on version number
 io.enable('browser client gzip');          // gzip the file
 io.set('log level', 1);                    // reduce logging
@@ -62,14 +64,23 @@ io.sockets.on('connection', function (socket)
 	socket.emit('connectionSuccess', {salt:mapSalts[socket.id]});
 	//wait for client to  tell us which course they're in, or...
 	
-	socket.on('courseCode', function (courseCode) 
+	socket.on('courseCode', function (data) 
 	{
-		courseCode=courseCode.toUpperCase();
-		console.log("Client (" + socket.handshake.address.address+" has been placed in room: "+courseCode);
+		var courseCode=data.courseCode.toUpperCase();
+		
+		var uuid=data.uuid;
+		if (!isValidUUID(uuid))
+		{
+			uuid=shortId.generate();
+			console.log("new uuid: "+uuid);
+		}
+		else
+			console.log("valid uuid: "+uuid);
+		console.log("Client (" + uuid+" has been placed in room: "+courseCode);
 		socket.join(courseCode);
-		socket.emit('joinedRoom', {roomName:courseCode, success: true});
+		socket.emit('joinedRoom', {roomName:courseCode, uuid: uuid, success: true});
 		//check if there is a current poll and the client hasn't already responsed to it
-		if (mapPolls[courseCode] && !mapPolls[courseCode].submittedClients[socket.handshake.address.address])
+		if (mapPolls[courseCode] && !mapPolls[courseCode].submittedClients[uuid])
 			socket.emit('pushNewPoll', {pollName: mapPolls[courseCode].pollName, numOptions:mapPolls[courseCode].numOptions});
 		
 	});
@@ -161,7 +172,7 @@ io.sockets.on('connection', function (socket)
 			console.log("Invalid poll reply: submission is out of range");
 			socket.emit('pollSubmissionComplete', {pollName: data.pollName, success: false, reason:'outOfRange'});
 		}
-		else if (mapPolls[data.courseCode].submittedClients[socket.handshake.address.address])
+		else if (mapPolls[data.courseCode].submittedClients[data.uuid] || !isValidUUID(data.uuid))
 		{
 			console.log("Invalid poll reply: client has already submitted poll response");
 			socket.emit('pollSubmissionComplete', {pollName: data.pollName, success: false, reason:'duplicate'});
@@ -171,13 +182,21 @@ io.sockets.on('connection', function (socket)
 			//have to minus 1 because poll options are 1->N and array is 0->N-1
 			mapResults[data.courseCode].results[data.submission-1]++;
 			//record IP address of those who submitted
-			mapPolls[data.courseCode].submittedClients[socket.handshake.address.address]=true;
+			mapPolls[data.courseCode].submittedClients[data.uuid]=true;
 			//emit success to the student
 			socket.emit('pollSubmissionComplete', {pollName: data.pollName, success: true});			
 		}		
-	});
-	
-	
+	});	
 });
+
+function isValidUUID(uuid)
+{
+	if (uuid===null || uuid==undefined || uuid=="undefined"|| uuid.length<6 || uuid.length>12)
+		return false;
+	else
+		return true;
+}
+
+
 
 console.log("Listening on port " + port);
