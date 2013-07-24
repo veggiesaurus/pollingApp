@@ -66,22 +66,28 @@ io.sockets.on('connection', function (socket)
 	
 	socket.on('courseCode', function (data) 
 	{
-		var courseCode=data.courseCode.toUpperCase();
-		
-		var uuid=data.uuid;
-		if (!isValidUUID(uuid))
+		//check for valid course code
+		if (data.courseCode)
 		{
-			uuid=shortId.generate();
-			console.log("new uuid: "+uuid);
+			
+			var courseCode=data.courseCode.toUpperCase();
+		
+		
+			var uuid=data.uuid;
+			if (!isValidUUID(uuid))
+			{
+				uuid=shortId.generate();
+				console.log("new uuid: "+uuid);
+			}
+			else
+				console.log("valid uuid: "+uuid);
+			console.log("Client (" + uuid+" has been placed in room: "+courseCode);
+			socket.join(courseCode);
+			socket.emit('joinedRoom', {roomName:courseCode, uuid: uuid, success: true});
+			//check if there is a current poll and the client hasn't already responsed to it
+			if (mapPolls[courseCode] && !mapPolls[courseCode].submittedClients[uuid])
+				socket.emit('pushNewPoll', {pollName: mapPolls[courseCode].pollName, numOptions:mapPolls[courseCode].numOptions});
 		}
-		else
-			console.log("valid uuid: "+uuid);
-		console.log("Client (" + uuid+" has been placed in room: "+courseCode);
-		socket.join(courseCode);
-		socket.emit('joinedRoom', {roomName:courseCode, uuid: uuid, success: true});
-		//check if there is a current poll and the client hasn't already responsed to it
-		if (mapPolls[courseCode] && !mapPolls[courseCode].submittedClients[uuid])
-			socket.emit('pushNewPoll', {pollName: mapPolls[courseCode].pollName, numOptions:mapPolls[courseCode].numOptions});
 		
 	});
 	//...authenticate as the lecturer
@@ -172,7 +178,7 @@ io.sockets.on('connection', function (socket)
 			console.log("Invalid poll reply: submission is out of range");
 			socket.emit('pollSubmissionComplete', {pollName: data.pollName, success: false, reason:'outOfRange'});
 		}
-		else if (mapPolls[data.courseCode].submittedClients[data.uuid] || !isValidUUID(data.uuid))
+		else if (!data.uuid || !isValidUUID(data.uuid) || mapPolls[data.courseCode].submittedClients[data.uuid] )
 		{
 			console.log("Invalid poll reply: client has already submitted poll response");
 			socket.emit('pollSubmissionComplete', {pollName: data.pollName, success: false, reason:'duplicate'});
