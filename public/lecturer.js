@@ -336,6 +336,12 @@ function chartResults(pollName, results)
                 [0, '#f7931e'],
                 [1, '#f7b33e']				
                 ]}, 
+			{
+            linearGradient: perShapeGradient,
+            stops: [
+                [0, '#aF00aF'],
+                [1, '#dF10dF']				
+                ]}
         ],
         series: [{name: 'Votes',data: results}]
     });    
