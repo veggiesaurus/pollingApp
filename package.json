@@ -1,6 +1,6 @@
 {
 	"name": "RealtimePollingUCT",
-	"version": "0.0.0",
+	"version": "0.0.2",
 	"description": "Real time polling for UCT Physics",
 	"dependencies": {
 		"socket.io": "latest",
@@ -17,6 +17,10 @@
     }],
 	"repository": {
     "type": "git",
+	"subdomain": "uctphysics-polling",
+	"scripts": {
+		"start": "node index.js"
+	},
     "url": "https://github.com/veggiesaurus/phyPollingApp.git"
     }
 }
