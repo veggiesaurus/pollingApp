@@ -69,7 +69,7 @@ function displayPollOptions(pollName, numOptions)
 	var swatch=["f", "g", "i", "a", "h", "j"];
 	for (var i=0;i<numOptions;i++)
 	{
-		optionsHtml+="<a data-role='button' data-transition='fade' data-theme='"+swatch[i]+"' onclick='submitPoll(\""+pollName+"\" ,"+(i+1)+");'>Option "+(i+1)+"</a>"
+		optionsHtml+="<a data-role='button' data-transition='fade' data-theme='"+swatch[i]+"' onclick='submitPoll(\""+pollName+"\" ,"+(i+1)+");'>Option "+String.fromCharCode('A'.charCodeAt() + i)+"</a>"
 	}
 	$('#pollCollapsible').trigger('expand');
 	$("#poll").html(optionsHtml);			

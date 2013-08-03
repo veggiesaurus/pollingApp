@@ -197,9 +197,9 @@ function CreatePoll()
 function chartResults(pollName, results)
 {
     //create the histogram with empty values	
-    var xVals=new Array(results.length);
+    var xVals=new Array(results.length);	
 	for (var i=0;i<xVals.length;i++)
-		xVals[i]=i+1;
+		xVals[i]=String.fromCharCode('A'.charCodeAt() + i);
 		
 	var perShapeGradient = {
 		x1: 0,
