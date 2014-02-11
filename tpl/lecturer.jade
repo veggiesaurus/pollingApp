@@ -1,16 +1,17 @@
 extends layout
-block headerScripts
 
-	script(src='/poll/util/md5-min.js')
-	script(src='/poll/util/dateFormat.js')
-	script(src='/poll/lecturer.js')	
+block headerScripts
 	script.
 		room="#{room}";
+	script(src='/poll/util/md5-min.js')
+	script(src='/poll/util/dateFormat.js')
+	script(src='/poll/lecturer.js')
+
 block content
 	div#page1(data-role='page')
 		div(data-theme='a',data-role='header')
 			h3 UCT PhysPoll (Lecturer)
-		div(data-role='content')			
+		div(data-role='content')
 			a#btnOpenLogin(data-role='button', data-theme="b") Login
 			a#btnUpdate(data-role='button', data-theme="b", class="ui-disabled") Update
 			a#btnNewPoll(data-role='button', data-theme="b", class="ui-disabled") Create new poll			

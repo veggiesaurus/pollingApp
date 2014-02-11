@@ -2,7 +2,7 @@ div#popupPoll(href="#popupPoll", data-role='popup', data-transition="flow", data
 	p
 		input#pollName(placeholder="Poll Name")
 		label(for='sliderNumoptions') How many options:
-		input#sliderNumoptions(type='range', name='sliderNumoptions', value='4', min='2', max='6', data-highlight="true")
+		input#sliderNumoptions(type='range', name='sliderNumoptions', value='4', min='2', max='6', data-highlight="true")		
 		a#btnAcceptPoll(data-role='button',data-mini="true",data-theme="b", onclick="CreatePoll();") Create
 		a#btnCancelPoll(data-role="button", data-theme="e", data-transition="fade", data-mini="true", onclick="$('#popupPoll').popup('close');") Cancel
 
