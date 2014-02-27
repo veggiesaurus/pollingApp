@@ -8,8 +8,8 @@ var mapTimers={};
 var mapResults={};
 var mapSalts={};
 //hard coded for now, protected by salt
-var passwordMD5="99f695a9e1d5ee3f49cabd01750986e2";
-
+var passwordMD5="29cd599ca39ad8a6fd8f4111e5614b9a";
+				 
 app.set('views', __dirname + '/tpl');
 app.set('view engine', "jade");
 app.engine('jade', require('jade').__express);
