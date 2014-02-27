@@ -66,10 +66,10 @@ function displayPollOptions(pollName, numOptions)
 	$("#pollHeading").html("Current Poll: "+pollName);	
 	var optionsHtml="";
 	//colour fix for 1031S slides jumbles up swatches a little
-	var swatch=["f", "g", "i", "a", "h", "j"];
+	var swatch=["f", "g", "i", "a", "h", "j", "b", "e"];
 	for (var i=0;i<numOptions;i++)
 	{
-		optionsHtml+="<a data-role='button' data-transition='fade' data-theme='"+swatch[i]+"' onclick='submitPoll(\""+pollName+"\" ,"+(i+1)+");'>Option "+String.fromCharCode('A'.charCodeAt() + i)+"</a>"
+		optionsHtml+="<a data-role='button' data-transition='fade' data-theme='"+swatch[i]+"' onclick='submitPoll(\""+pollName+"\" ,"+(i+1)+");'>Option "+String.fromCharCode('A'.charCodeAt() + i)+" / " +(i+1)+"</a>"
 	}
 	$('#pollCollapsible').trigger('expand');
 	$("#poll").html(optionsHtml);			

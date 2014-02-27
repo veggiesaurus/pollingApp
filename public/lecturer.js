@@ -199,7 +199,7 @@ function chartResults(pollName, results)
     //create the histogram with empty values	
     var xVals=new Array(results.length);	
 	for (var i=0;i<xVals.length;i++)
-		xVals[i]=String.fromCharCode('A'.charCodeAt() + i);
+		xVals[i]=String.fromCharCode('A'.charCodeAt() + i)+" / " +(i+1);
 		
 	var perShapeGradient = {
 		x1: 0,
@@ -341,6 +341,16 @@ function chartResults(pollName, results)
             stops: [
                 [0, '#aF00aF'],
                 [1, '#dF10dF']				
+                ]},
+			{linearGradient: perShapeGradient,
+            stops: [
+                [0, '#5E9AC4'],
+                [1, '#3D6FA2']				
+                ]},
+			{linearGradient: perShapeGradient,
+            stops: [
+                [0, '#FFEEA6'],
+                [1, '#FFE25C']				
                 ]}
         ],
         series: [{name: 'Votes',data: results}]
