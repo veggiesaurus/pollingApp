@@ -198,9 +198,12 @@ function chartResults(pollName, results)
 {
     //create the histogram with empty values	
     var xVals=new Array(results.length);	
+	var totalVotes=0;
 	for (var i=0;i<xVals.length;i++)
+	{
 		xVals[i]=String.fromCharCode('A'.charCodeAt() + i)+" / " +(i+1);
-		
+		totalVotes+=results[i];
+	}	
 	var perShapeGradient = {
 		x1: 0,
 		y1: 0,
@@ -221,7 +224,7 @@ function chartResults(pollName, results)
             enabled: false
         },
         title: {
-            text: '<b>Poll Results: </b>'+pollName,
+            text: '<b>Poll Results ('+totalVotes+' vote'+(totalVotes==1?'':'s')+'): </b>'+pollName,
 			style:
 			{
 				fontSize: '150%'
