@@ -3,18 +3,66 @@ extends layout
 block headerScripts
 	script.
 		room="#{room}";
-	script(src='/poll/util/md5-min.js')
-	script(src='/poll/util/dateFormat.js')
-	script(src='/poll/lecturer.js')
+	script(src='/highcharts/js/highcharts-custom.js')
+	script(src='/util/dateFormat.js')
+	script(src='/util/slider.js')
+	script(src='/util/md5-min.js')
+	script(src='/lecturer.js')
 block content
-	div#page1(data-role='page')
-		div(data-theme='b',data-role='header')
-			div(align="center")
-				h3 UCT PhysPoll (Lecturer)
-		div(data-role='content')
-			a#btnOpenLogin(data-role='button', data-theme="b") Login
-			a#btnUpdate(data-role='button', data-theme="b", class="ui-disabled") Update
-			a#btnNewPoll(data-role='button', data-theme="b", class="ui-disabled") Create new poll			
-			#resultsChart(data-role='content')
-			include lecturerPopups
-		
+	div(class='navbar navbar-default', role = 'navigation')
+		.container
+			.navbar-header
+				.navbar-brand
+					span(class='glyphicon glyphicon-pencil pad10h')
+					|UCT QuickPoll (Admin)
+	.container
+		.row
+			.col-xs-12
+				#authPanel(class='panel panel-primary')
+					.panel-heading
+						h3.panel-title
+							|Login
+					.panel-body
+						.row
+							.col-xs-8
+								input#password(class='form-control', type="password",placeholder="Password")
+							.col-xs-4
+								button#btnLogin(class='btn btn-info btn-block')
+									|Login
+		.row
+			.col-xs-12
+				#alertAuthError(class='alert alert-danger', role='alert', style='display:none')
+					span(class='glyphicon glyphicon-remove pad7h')
+					span
+						|Authentication error	
+	.container-fluid
+		.row
+			div(class='col-xs-12 pad30h bottom15')
+				#resultsChart(data-role='content')
+	.container
+		#createPollRow(class='row pad10v', style='display:none')
+			.col-xs-2
+				button#btnNewPoll(class='btn btn-success btn-block') Create new poll
+			.col-xs-2
+				button#btnUpdate(class='btn btn-info btn-block') Update		
+		.row
+			.col-xs-12
+		#pollPanel(class='panel panel-primary', style='display:none')
+			.panel-heading
+				h3.panel-title Create new poll
+			.panel-body
+				.row
+					.col-xs-12
+						input#pollName(class='form-control', placeholder="Poll Name")
+				.row
+					label(for='optionsSlider', class='col-xs-12 col-sm-3 col-md-3 col-lg-2 control-label') 
+						|Number of options: 
+						span#optionsCount
+							|4
+					div(class='col-lg-10 col-md-9 col-sm-9 col-xs-12 pad7v')
+						#optionsSlider(class='ui-slider')
+				.row
+					div(class='col-sm-4 col-md-2 col-xs-6')
+						button#btnAcceptPoll(class='btn btn-success btn-block') Create
+					div(class='col-sm-4 col-md-2 col-xs-6')
+						button#btnCancelPoll(class='btn btn-danger btn-block') Cancel
