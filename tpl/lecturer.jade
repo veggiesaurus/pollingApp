@@ -41,34 +41,28 @@ block content
 				#resultsChart(data-role='content')
 	.container
 		#createPollRow(class='row pad10v', style='display:none')
-<<<<<<< HEAD
-			div(class='col-sm-4 col-md-2 col-xs-6')
+			div(class='col-sm-4 col-md-2 col-xs-6')			
 				button#btnNewPoll(class='btn btn-success btn-block') Create new poll
 			div(class='col-sm-4 col-md-2 col-xs-6')
-=======
-			.col-xs-2
-				button#btnNewPoll(class='btn btn-success btn-block') Create new poll
-			.col-xs-2
->>>>>>> 21dcbcb9b49d8ee7e9e65ed85e54248e544b6ba7
 				button#btnUpdate(class='btn btn-info btn-block') Update		
 		.row
 			.col-xs-12
-		#pollPanel(class='panel panel-primary', style='display:none')
-			.panel-heading
-				h3.panel-title Create new poll
-			.panel-body
-				.row
-					.col-xs-12
-						input#pollName(class='form-control', placeholder="Poll Name")
-				.row
-					label(for='optionsSlider', class='col-xs-12 col-sm-3 col-md-3 col-lg-2 control-label') 
-						|Number of options: 
-						span#optionsCount
-							|4
-					div(class='col-lg-10 col-md-9 col-sm-9 col-xs-12 pad7v')
-						#optionsSlider(class='ui-slider')
-				.row
-					div(class='col-sm-4 col-md-2 col-xs-6')
-						button#btnAcceptPoll(class='btn btn-success btn-block') Create
-					div(class='col-sm-4 col-md-2 col-xs-6')
-						button#btnCancelPoll(class='btn btn-danger btn-block') Cancel
+				#pollPanel(class='panel panel-primary', style='display:none')
+					.panel-heading
+						h3.panel-title Create new poll
+					.panel-body
+						.row
+							.col-xs-12
+								input#pollName(class='form-control', placeholder="Poll Name")
+						.row
+							label(for='optionsSlider', class='col-xs-12 col-sm-3 col-md-3 col-lg-2 control-label') 
+								|Number of options: 
+								span#optionsCount
+									|4
+							div(class='col-lg-10 col-md-9 col-sm-9 col-xs-12 pad7v')
+								#optionsSlider(class='ui-slider')
+						.row
+							div(class='col-sm-4 col-md-2 col-xs-6')
+								button#btnAcceptPoll(class='btn btn-success btn-block') Create
+							div(class='col-sm-4 col-md-2 col-xs-6')
+								button#btnCancelPoll(class='btn btn-danger btn-block') Cancel
