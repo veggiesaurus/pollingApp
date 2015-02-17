@@ -6,18 +6,15 @@ if (!window.console) console = {log: function() {}};
 function initFunction()
 {
     //disable zooming
-    $.extend($.mobile.zoom, {locked:true,enabled:false});
-    //loading screen
-    $.mobile.loader.prototype.options.text = "Loading";
-    $.mobile.loader.prototype.options.textVisible = true;
-    $.mobile.loader.prototype.options.theme = "a";
-    $.mobile.loader.prototype.options.html = "";  
+    $.extend($.mobile.zoom, {locked:true,enabled:false});  
 }
 
 window.onload = function() 
 {
+	$("#pollPanel").hide();
+	hideAlerts();	
+	$("#alertStudentWaiting").slideDown();
 	location.hash="";
-	$.mobile.loading('show');
 	var messages = [];
 	var polls = [];
 	//room variable comes from jade parameter (server-sent)
@@ -35,7 +32,6 @@ window.onload = function()
 	
 	socket.on('joinedRoom', function (data)
 	{
-		$.mobile.loading( 'hide');
 		if (data.success)
 		{
 			console.log("Client has been placed in the "+data.roomName+" room");
@@ -51,8 +47,7 @@ window.onload = function()
 		if(data.pollName) 
 		{
 			console.log("Current poll: ", data.pollName+". Number of options: "+data.numOptions);
-			displayPollOptions(data.pollName, data.numOptions);
-			$( "#popupStudentError" ).popup("close");
+			displayPollOptions(data.pollName, data.numOptions);			
 		} 
 		else 
 		{
@@ -63,50 +58,67 @@ window.onload = function()
 
 function displayPollOptions(pollName, numOptions)
 {
-	$("#pollHeading").html("Current Poll: "+pollName);	
-	var optionsHtml="";
-	//colour fix for 1031S slides jumbles up swatches a little
-	var swatch=["f", "g", "i", "a", "h", "j", "b", "e"];
+	$("#pollHeading").html("Current Poll: "+pollName);
+	slideUpAlerts();
+	$("#pollPanel").slideUp();
+	
+	var divHtml="<div class='col-lg-3 col-md-4 col-sm-6 col-xs-12 bottom7'>"	
+	var optionsHtml="<div class='row'>";
+	var buttonClass="btn btn-hg btn-block btn-info"	
 	for (var i=0;i<numOptions;i++)
 	{
-		optionsHtml+="<a data-role='button' data-transition='fade' data-theme='"+swatch[i]+"' onclick='submitPoll(\""+pollName+"\" ,"+(i+1)+");'>Option "+String.fromCharCode('A'.charCodeAt() + i)+" / " +(i+1)+"</a>"
+		var optionLetter=String.fromCharCode('A'.charCodeAt() + i);		
+		optionsHtml+=divHtml+"<button type='button' class='"+buttonClass+" btn-"+optionLetter+"' onclick='submitPoll(\""+pollName+"\" ,"+(i+1)+");'>Option "+optionLetter+" / " +(i+1)+"</button></div>"
 	}
-	$('#pollCollapsible').trigger('expand');
-	$("#poll").html(optionsHtml);			
-	$('.ui-page-active').page("destroy").page();		
-	$("#pollCollapsible").slideDown();
+	optionsHtml+="</div>"	
+	$("#poll").html(optionsHtml);				
+	$("#pollPanel").slideDown();
 }
 
 function submitPoll(pollName, option)
 {
-	$.mobile.loading('show');
+	slideUpAlerts();
 	console.log("Option "+option+" clicked");
 	socket.emit('pollSubmission', {courseCode:sessionStorage.getItem("courseCode"), pollName:pollName, uuid:localStorage.getItem("polling_uuid"), submission:option});
 		
 	socket.on('pollSubmissionComplete', function (data)
 	{
-		$.mobile.loading( 'hide');
 		if (data.success)
-		{
-			$("#poll").html("<h3 align='center'>Submitted poll \""+pollName+"\"</h3>");
-			$('.ui-page-active').page("destroy").page();
+		{				
+			$("#pollPanel").slideUp();
+			$("#pollName").html(pollName);			
+			$( "#alertStudentSubmitted" ).slideDown();			
 		}
 		else
 		{
+			$("#pollNameError").html(pollName);
 			if (data.reason == 'missingData')
-				$("#popupStudentErrorMessage").html("<b>Error</b>: Missing data. Refresh the page to reconnect.");
+				$("#pollErrorDetails").html("<b>Error</b>: Missing data. Refresh the page to reconnect.");
 			else if (data.reason == 'invalidPoll')
-				$("#popupStudentErrorMessage").html("<b>Error</b>: Poll is no longer open. Refresh the page to reconnect.");
+				$("#pollErrorDetails").html("<b>Error</b>: Poll is no longer open. Refresh the page to reconnect.");
 			else if (data.reason == 'outOfRange')
-				$("#popupStudentErrorMessage").html("<b>Error</b>: Poll entry is out of range. Try another option.");
+				$("#pollErrorDetails").html("<b>Error</b>: Poll entry is out of range. Try another option.");
 			else if (data.reason == 'duplicate')
-				$("#popupStudentErrorMessage").html("<b>Error</b>: You have already answered this poll. If you believe this is incorrect, try refreshing the page.");
+				$("#pollErrorDetails").html("<b>Error</b>: You have already answered this poll. If you believe this is incorrect, try refreshing the page.");
 			else
-				$("#popupStudentErrorMessage").html("<b>Error</b>: An unknown error occured.");
+				$("#pollErrorDetails").html("<b>Error</b>: An unknown error occurred.");
 				
-			$( "#popupStudentError" ).popup("open");
+			$( "#alertStudentError" ).slideDown();
 		}
 			
-	});
-	
+	});	
+}
+
+function slideUpAlerts()
+{
+	$( "#alertStudentSubmitted" ).slideUp();
+	$( "#alertStudentError" ).slideUp();
+	$( "#alertStudentWaiting" ).slideUp();
+}
+
+function hideAlerts()
+{
+	$( "#alertStudentSubmitted" ).hide();
+	$( "#alertStudentError" ).hide();
+	$( "#alertStudentWaiting" ).hide();
 }

@@ -14,83 +14,60 @@ $( document ).bind( 'mobileinit', initFunction);
 if (!window.console) console = {log: function() {}};
 
 
+
+
 function initFunction()
 {
     //disable zooming
     $.extend($.mobile.zoom, {locked:true,enabled:false});
-    //loading screen
-    $.mobile.loader.prototype.options.text = "Loading";
-    $.mobile.loader.prototype.options.textVisible = true;
-    $.mobile.loader.prototype.options.theme = "a";
-    $.mobile.loader.prototype.options.html = "";  	
-	$.mobile.loading( 'show');	
 }
 
 
 window.onload = function() 
 {	
 	location.hash="";
-	$('#authError').hide();
-	$("#btnNewPoll").addClass('ui-disabled');	
-	$.mobile.loading( 'show');
+	$('#alertAuthError').hide();
+	$("#btnNewPoll").addClass('ui-disabled');		
 	messages = [];
 	polls = [];	
 	host="http://"+window.location.hostname+":3700";
 	sessionStorage.setItem("courseCode", room.toUpperCase());
 	
-	openLoginButton = document.getElementById("btnOpenLogin");
+	if ($('#optionsSlider').length > 0) {
+		$('#optionsSlider').slider({
+			min: 2,
+			max: 8,
+			value: 4,
+			orientation: 'horizontal',
+			range: 'min'
+		}).addSliderSegments($('#optionsSlider').slider('option').max);
+	}
 	
-	
-	openLoginButton.onclick = openLogin = function() 
-	{			
-		$('#popupAuth').popup("open");
-	};	
-	
-	loginButton = document.getElementById("btnLogin");
-	loginButton.onclick = login = function() 
-	{
-		sessionStorage.setItem("passwordMD5", hex_md5($("#password").val()));	
-		var unhashedSalt=sessionStorage.getItem("passwordMD5")+salt;
-		console.log("Unhashed salt: "+unhashedSalt);		
-		var saltedHash=hex_md5(unhashedSalt);
-		console.log("Salted Hash: "+saltedHash);
-		socket.emit('auth', {passwordMD5: saltedHash, courseCode: sessionStorage.getItem("courseCode")});
-		$.mobile.loading( 'show');		
-	};
-	updateButton = document.getElementById("btnUpdate");
-	updateButton.onclick = login;
-	newPollButton = document.getElementById("btnNewPoll");
-		
-	newPollButton.onclick = addNewPoll = function() 
-	{	
-		if (!loggedIn)
-			return;
-		var now = new Date();		
-		var proposedName=now.format("m_dd_HH_MM");
-		//if the previous poll is already called that
-		if (proposedName==pollName)
-			proposedName+="_alt";
-		$("#pollName").attr("value", proposedName);
-		$('#popupPoll').popup("open");
-	};	
+	$("#btnLogin").off().click(submitAuth);		
+	$("#btnUpdate").off().click(submitAuth);	
+	$("#btnNewPoll").off().click(addNewPoll);
+	$("#btnAcceptPoll").off().click(createPoll);
+	$("#btnCancelPoll").off().click(hidePollPanel);
+	$('#optionsSlider').on("change", updateRatingText);
+	$( "#optionsSlider" ).on( "slide", updateRatingText);
+	$('#password').focus();
+	$('#password').select();
 	
 	socket = io.connect(host);	
 	socket.on('connectionSuccess', function (data)
 	{
 		salt=data.salt;
 		console.log("Connected to server");
-		$.mobile.loading( 'hide');
 	});
 	
 	socket.on('authComplete', function (data)
-	{
-		$.mobile.loading( 'hide');
+	{		
 		if (data.success)
 		{
-			$('#authError').slideUp();
-			
-			console.log("Lecturer has authenticated");			
-			$('#popupAuth').popup("close");			
+			$('#alertAuthError').slideUp();
+			$('#authPanel').slideUp();
+			$('#createPollRow').slideDown();
+			console.log("Lecturer has authenticated");						
 			$("#btnNewPoll").removeClass('ui-disabled');			
 			$("#btnUpdate").removeClass('ui-disabled');
 			$("#btnOpenLogin").slideUp();
@@ -99,7 +76,7 @@ window.onload = function()
 		else
 		{
 			console.log("Lecturer has failed to be authenticated");
-			$('#authError').slideDown();
+			$('#alertAuthError').slideDown();
 			loggedIn=false;
 		}
 	});
@@ -108,16 +85,14 @@ window.onload = function()
 	{
 		if (data.success)
 		{
-			console.log("Poll "+data.pollName+" has been pushed to students");
-			$.mobile.loading( 'hide');
-			$( "#popupPoll" ).popup( "close" );
+			console.log("Poll "+data.pollName+" has been pushed to students");			
+			$("#pollPanel").slideUp();
 			$('#resultsChart').slideUp();			
 			firstUpdate=true;
 			
 		}
 		else
-			console.log("Poll has not been pushed to students");
-		$.mobile.loading( 'hide');					
+			console.log("Poll has not been pushed to students");					
 	});
 	
 	socket.on('pushResults', function (data)
@@ -150,48 +125,66 @@ window.onload = function()
 
 $(document).ready(function() 
 {	
-	$("#popupPoll").keyup(function(e) 
+	$("#pollName").keyup(function(e) 
 	{
 		if(e.keyCode == 13) 
 		{
-			CreatePoll();
+			createPoll();
 		}
 	});
 	
-	$("#popupAuth").keyup(function(e) 
+	$("#password").keyup(function(e) 
 	{
 		if(e.keyCode == 13) 
 		{
-			login();
+			submitAuth();
 		}
 	});
 });
 
-$(document).on('pagebeforeshow', '#page1', function()
-{ 	
-	$( "#popupPoll" ).popup({
-        afteropen: function( event, ui ) 
-		{
-            $('#pollName').focus();
-			$('#pollName').select();
-        }
-    });	
-	$( "#popupAuth" ).popup({
-        afteropen: function( event, ui ) {
-            $('#password').focus();
-        }
-    });	
-});
-
-function CreatePoll()
+function submitAuth()
 {
-	$.mobile.loading( 'show');
+	sessionStorage.setItem("passwordMD5", hex_md5($("#password").val()));	
+	var unhashedSalt=sessionStorage.getItem("passwordMD5")+salt;
+	console.log("Unhashed salt: "+unhashedSalt);		
+	var saltedHash=hex_md5(unhashedSalt);
+	console.log("Salted Hash: "+saltedHash);
+	socket.emit('auth', {passwordMD5: saltedHash, courseCode: sessionStorage.getItem("courseCode")});	
+}
+
+function addNewPoll()
+{	
+	if (!loggedIn)
+		return;
+	$("#pollPanel").slideDown();
+	var now = new Date();		
+	var proposedName=now.format("m_dd_HH_MM");
+	//if the previous poll is already called that
+	if (proposedName==pollName)
+		proposedName+="_alt";
+	$("#pollName").attr("value", proposedName);	
+	$('#pollName').focus();
+	$('#pollName').select();
+}
+
+function hidePollPanel()
+{
+	$("#pollPanel").slideUp();
+}
+
+function createPoll()
+{
+	//$.mobile.loading( 'show');
 	console.log("Creating Poll");
 	var unhashedSalt=sessionStorage.getItem("passwordMD5")+salt;
 	console.log("Unhashed salt: "+unhashedSalt);
 	var saltedHash=hex_md5(unhashedSalt);
 	console.log("Salted Hash: "+saltedHash);
-	socket.emit('newPoll', {passwordMD5: saltedHash, courseCode: sessionStorage.getItem("courseCode"), pollName: $('#pollName').val(), numOptions: $('#sliderNumoptions').val() });
+	socket.emit('newPoll', {passwordMD5: saltedHash, courseCode: sessionStorage.getItem("courseCode"), pollName: $('#pollName').val(), numOptions: $('#optionsSlider').slider("option", "value") });
+}
+
+var updateRatingText = function (event, ui) {
+	$('#optionsCount').text(ui.value);	
 }
 
 function chartResults(pollName, results)

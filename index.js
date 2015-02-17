@@ -1,5 +1,10 @@
 var express = require("express");
+var http = require('http');
+var crypto = require('crypto');
+var shortId = require('shortid');
 var app = express();
+var server = http.Server(app);
+var io = require('socket.io')(server);
 var port = 3700;
 var uuidCounter=1040;
 var mapPolls={};
@@ -16,9 +21,29 @@ app.engine('jade', require('jade').__express);
 app.set('view options', { pretty: true });
 app.use(express.static(__dirname + '/public'));
 
+
+
+io.set('log level', 5);                    // reduce logging
+//production settings
+
+//io.enable('browser client minification');  // send minified client
+
+//io.enable('browser client etag');          // apply etag caching logic based on version number
+//io.enable('browser client gzip');          // gzip the file
+io.set('log level', 1);                    // reduce logging
+
+// enable all transports (optional if you want flashsocket support, please note that some hosting
+// providers do not allow you to create servers that listen on a port different than 80 or their
+// default port)
+io.set('transports', ['websocket',                       
+                      'htmlfile', 
+                      'xhr-polling', 
+                      'jsonp-polling', 
+                      'polling']);
+
 app.get("/lecView/:id([0-9]+):courseType(w|f|h|s)(\/(:sub([0-9])))?", function(req, res)
 {
-	console.log(req.params);
+	console.log("Req params: %j", req.params);
 	res.render("lecturer", {room:req.params.id+req.params.courseType+(req.params.sub?req.params.sub:"")});
 });
 
@@ -33,27 +58,7 @@ app.get("/", function(req, res){
 	res.render("student");
 });
 
-var crypto = require('crypto');
-var shortId = require('shortid');
-var io = require('socket.io').listen(app.listen(port));
-io.set('log level', 5);                    // reduce logging
-//production settings
 
-io.enable('browser client minification');  // send minified client
-
-//io.enable('browser client etag');          // apply etag caching logic based on version number
-//io.enable('browser client gzip');          // gzip the file
-io.set('log level', 1);                    // reduce logging
-
-// enable all transports (optional if you want flashsocket support, please note that some hosting
-// providers do not allow you to create servers that listen on a port different than 80 or their
-// default port)
-io.set('transports', [
-    'websocket'  
-  , 'htmlfile'
-  , 'xhr-polling'
-  , 'jsonp-polling'
-]);
 
 
 io.sockets.on('connection', function (socket) 
@@ -112,7 +117,7 @@ io.sockets.on('connection', function (socket)
 		
 	socket.on('newPoll', function (data) 
 	{	
-		console.log("Recieved new poll: "+data);
+		console.log("Recieved new poll: %j", data);
 		if (data.courseCode)
 			data.courseCode=data.courseCode.toUpperCase();
 		var saltedHash=crypto.createHash('md5').update(passwordMD5+mapSalts[socket.id]).digest("hex");
@@ -202,6 +207,6 @@ function isValidUUID(uuid)
 		return true;
 }
 
-
-
-console.log("Listening on port " + port);
+server.listen(port, function(){
+  console.log('listening on port '+port);
+});

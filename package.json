@@ -1,26 +1,27 @@
 {
-	"name": "RealtimePollingUCT",
-	"version": "0.0.2",
-	"description": "Real time polling for UCT Physics",
-	"dependencies": {
-		"socket.io": "latest",
-		"express": "latest",
-		"jade": "latest",
-		"crypto": "latest",
-		"shortid": "latest"
-	},
-	"author": "veggiesaurus",
-	"contributors": [ 
+  "name": "RealtimePollingUCT",
+  "version": "0.0.2",
+  "description": "Real time polling for UCT Physics",
+  "dependencies": {
+    "crypto": "0.0.3",
+    "express": "^4.9.8",
+    "jade": "^1.7.0",    
+    "shortid": "^2.0.1",
+    "socket.io": "^1.1.0"
+  },
+  "author": "veggiesaurus",
+  "contributors": [
     {
       "name": "Angus Comrie",
       "email": "accomrie@gmail.com"
-    }],
-	"repository": {
-    "type": "git",
-	"subdomain": "uctphysics-polling",
-	"scripts": {
-		"start": "node index.js"
-	},
-    "url": "https://github.com/veggiesaurus/phyPollingApp.git"
     }
+  ],
+  "repository": {
+    "type": "git",
+    "subdomain": "uctphysics-polling",
+    "scripts": {
+      "start": "node index.js"
+    },
+    "url": "https://github.com/veggiesaurus/phyPollingApp.git"
+  }
 }

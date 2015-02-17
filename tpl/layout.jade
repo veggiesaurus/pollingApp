@@ -1,15 +1,14 @@
 doctype html
 html
 	head
-		title= "UCT PhysPoll"		
-		link(rel='stylesheet', href='/poll/jquery/extraSwatches.min.css')
-		link(rel='stylesheet', href='/poll/jquery/jquery.mobile.structure-1.3.2.min.css')
-		script(src='/poll/jquery/jquery-1.11.0.min.js')
-		script(src='/poll/jquery/jquery.mobile-1.3.2.min.js')
-		script(src='/poll/highcharts/js/highcharts.js')
-		script(src='/poll/highcharts/js/modules/exporting.js')
+		title= "UCT QuickPoll"				
+		link(rel='stylesheet', href='/poll/bootstrap/css/bootstrap.min.css')
+		link(rel='stylesheet', href='/poll/flat-ui/css/modules_flat-ui.min.css')
+		link(rel='stylesheet', href='/poll/flat-ui/css/extra.css')
+		script(src='/poll/jquery/jquery-1.11.1.min.js')
+		script(src='/poll/flat-ui/js/flat-ui.min.js')
 		script(src='/poll/socket.io/socket.io.js')
-		block headerScripts		
+		block headerScripts
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 	body(class="ui-mobile-viewport ui-overlay-c")
 		block content
