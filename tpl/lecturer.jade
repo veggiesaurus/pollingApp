@@ -3,11 +3,13 @@ extends layout
 block headerScripts
 	script.
 		room="#{room}";
-	script(src='/poll/highcharts/js/highcharts-custom.js')
-	script(src='/poll/util/dateFormat.js')
-	script(src='/poll/util/slider.js')
-	script(src='/poll/util/md5-min.js')
-	script(src='/poll/lecturer.js')
+		socketPort="#{socketPort}";
+		dept="#{dept}";
+	script(src='/highcharts/js/highcharts-custom.js')
+	script(src='/util/dateFormat.js')
+	script(src='/util/slider.js')
+	script(src='/util/md5-min.js')
+	script(src='/lecturer.js')
 block content
 	div(class='navbar navbar-default', role = 'navigation')
 		.container
@@ -37,14 +39,14 @@ block content
 						|Authentication error	
 	.container-fluid
 		.row
-			div(class='col-xs-12 pad30h bottom15')
+			div(class='col-xs-12 bottom15')
 				#resultsChart(data-role='content')
 	.container
 		#createPollRow(class='row pad10v', style='display:none')
 			div(class='col-sm-4 col-md-2 col-xs-6')			
 				button#btnNewPoll(class='btn btn-success btn-block') Create new poll
 			div(class='col-sm-4 col-md-2 col-xs-6')
-				button#btnUpdate(class='btn btn-info btn-block') Update		
+				button#btnReAuth(class='btn btn-info btn-block') Re-authenticate		
 		.row
 			.col-xs-12
 				#pollPanel(class='panel panel-primary', style='display:none')

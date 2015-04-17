@@ -20,7 +20,7 @@ window.onload = function()
 	//room variable comes from jade parameter (server-sent)
 	sessionStorage.setItem("courseCode", room.toUpperCase());
 	
-	var host="http://"+window.location.hostname+":3700";
+	var host="http://"+window.location.hostname+":"+socketPort;
 	socket = io.connect(host);		
 		
 	socket.on('connectionSuccess', function ()

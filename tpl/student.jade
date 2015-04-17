@@ -1,8 +1,9 @@
 extends layout
-block headerScripts	
-	script(src='/poll/student.js')
+block headerScripts		
 	script.
 		room="#{room}";
+		socketPort="#{socketPort}"
+	script(src='/student.js')
 block content
 	div(class='navbar navbar-default', role = 'navigation')
 		.container

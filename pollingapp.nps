@@ -1,0 +1,21 @@
+<NotepadPlus>
+    <Session activeView="0">
+        <mainView activeIndex="11">
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="360" startPos="167" endPos="167" selMode="0" lang="Normal Text" encoding="-1" filename="D:\CAEN\feb_tests\na22_ej299_sipm_c2_28.31V_trg_76_esr1_overnight.templog.txt" backupFilePath="" originalFileLastModifTimestamp="1424934927" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="387" startPos="448" endPos="448" selMode="0" lang="Normal Text" encoding="-1" filename="D:\CAEN\feb_tests\cs137_ej299_sipm_c2_28.31V_trg_75_esr1_2ch_overnight.templog.txt" backupFilePath="" originalFileLastModifTimestamp="1424767000" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="63" startPos="0" endPos="0" selMode="0" lang="Normal Text" encoding="-1" filename="D:\CAEN\feb_tests\cs137_ej299_sipm_c2_28.31V_trg_75_esr1_2ch_overnight2.dtz.templog.txt" backupFilePath="" originalFileLastModifTimestamp="1424858637" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="405" startPos="0" endPos="0" selMode="0" lang="Normal Text" encoding="-1" filename="D:\CAEN\dec_tests\temperature_testing\sensl_dayne_26.51V_ej299_esr_cs137_temp_test.templog.txt" backupFilePath="" originalFileLastModifTimestamp="1424865935" />
+            <File firstVisibleLine="49241" xOffset="0" scrollWidth="1261" startPos="344853" endPos="344853" selMode="0" lang="Normal Text" encoding="-1" filename="D:\CAEN\march_tests\c2\cs137_ej299_sipm_28.30V_trg_78_esr1_c2_front_overnight2.templog.txt" backupFilePath="" originalFileLastModifTimestamp="1425997563" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="477" startPos="0" endPos="0" selMode="0" lang="Normal Text" encoding="-1" filename="D:\CAEN\march_tests\hv_c2_single_files\setup.txt" backupFilePath="" originalFileLastModifTimestamp="1426069691" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="2439" startPos="0" endPos="0" selMode="0" lang="Normal Text" encoding="-1" filename="D:\CAEN\march_tests\coupling_c2\mn54_ej299_sipm_28.30V_trg_77_esr1_c2_ej550_calib.templog.txt" backupFilePath="" originalFileLastModifTimestamp="1426341810" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="873" startPos="215" endPos="215" selMode="0" lang="Javascript" encoding="-1" filename="C:\Users\Angus\Dropbox\UCT\pollingapp\secrets.json" backupFilePath="" originalFileLastModifTimestamp="1429118007" />
+            <File firstVisibleLine="27" xOffset="0" scrollWidth="1170" startPos="1590" endPos="1590" selMode="0" lang="Javascript" encoding="-1" filename="C:\Users\Angus\Dropbox\UCT\pollingapp\index.js" backupFilePath="" originalFileLastModifTimestamp="1429118387" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="549" startPos="0" endPos="0" selMode="0" lang="Javascript" encoding="-1" filename="C:\Users\Angus\Dropbox\UCT\pollingapp\public\student.js" backupFilePath="" originalFileLastModifTimestamp="1429109206" />
+            <File firstVisibleLine="15" xOffset="0" scrollWidth="936" startPos="620" endPos="620" selMode="0" lang="Javascript" encoding="-1" filename="C:\Users\Angus\Dropbox\UCT\pollingapp\public\lecturer.js" backupFilePath="" originalFileLastModifTimestamp="1429166275" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="720" startPos="233" endPos="233" selMode="0" lang="Normal Text" encoding="-1" filename="C:\Users\Angus\Dropbox\UCT\pollingapp\tpl\layout.jade" backupFilePath="" originalFileLastModifTimestamp="1429118289" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1035" startPos="235" endPos="235" selMode="0" lang="Normal Text" encoding="-1" filename="C:\Users\Angus\Dropbox\UCT\pollingapp\tpl\lecturer.jade" backupFilePath="" originalFileLastModifTimestamp="1429118342" />
+            <File firstVisibleLine="18" xOffset="0" scrollWidth="927" startPos="52" endPos="52" selMode="0" lang="Normal Text" encoding="-1" filename="C:\Users\Angus\Dropbox\UCT\pollingapp\tpl\student.jade" backupFilePath="" originalFileLastModifTimestamp="1429118355" />
+        </mainView>
+        <subView activeIndex="0" />
+    </Session>
+</NotepadPlus>

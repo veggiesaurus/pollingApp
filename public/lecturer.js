@@ -25,12 +25,12 @@ function initFunction()
 
 window.onload = function() 
 {	
-	location.hash="";
 	$('#alertAuthError').hide();
 	$("#btnNewPoll").addClass('ui-disabled');		
+	location.hash="";
 	messages = [];
 	polls = [];	
-	host="http://"+window.location.hostname+":3700";
+	host="http://"+window.location.hostname+":"+socketPort;
 	sessionStorage.setItem("courseCode", room.toUpperCase());
 	
 	if ($('#optionsSlider').length > 0) {
@@ -43,15 +43,7 @@ window.onload = function()
 		}).addSliderSegments($('#optionsSlider').slider('option').max);
 	}
 	
-	$("#btnLogin").off().click(submitAuth);		
-	$("#btnUpdate").off().click(submitAuth);	
-	$("#btnNewPoll").off().click(addNewPoll);
-	$("#btnAcceptPoll").off().click(createPoll);
-	$("#btnCancelPoll").off().click(hidePollPanel);
-	$('#optionsSlider').on("change", updateRatingText);
-	$( "#optionsSlider" ).on( "slide", updateRatingText);
-	$('#password').focus();
-	$('#password').select();
+	setupEvents();
 	
 	socket = io.connect(host);	
 	socket.on('connectionSuccess', function (data)
@@ -60,68 +52,10 @@ window.onload = function()
 		console.log("Connected to server");
 	});
 	
-	socket.on('authComplete', function (data)
-	{		
-		if (data.success)
-		{
-			$('#alertAuthError').slideUp();
-			$('#authPanel').slideUp();
-			$('#createPollRow').slideDown();
-			console.log("Lecturer has authenticated");						
-			$("#btnNewPoll").removeClass('ui-disabled');			
-			$("#btnUpdate").removeClass('ui-disabled');
-			$("#btnOpenLogin").slideUp();
-			loggedIn=true;
-		}
-		else
-		{
-			console.log("Lecturer has failed to be authenticated");
-			$('#alertAuthError').slideDown();
-			loggedIn=false;
-		}
-	});
-	
-	socket.on('pushedNewPoll', function (data)
-	{
-		if (data.success)
-		{
-			console.log("Poll "+data.pollName+" has been pushed to students");			
-			$("#pollPanel").slideUp();
-			$('#resultsChart').slideUp();			
-			firstUpdate=true;
-			
-		}
-		else
-			console.log("Poll has not been pushed to students");					
-	});
-	
-	socket.on('pushResults', function (data)
-	{
-		var dataChanged=false;
-		for (var i=0;i<results.length;i++)
-		{
-			if (results[i]!=data.results[i])
-			{
-				dataChanged=true;
-				break;
-			}
-		}
-		
-		if (!pollName || data.pollName!=pollName || dataChanged)
-		{
-			results=data.results;
-			pollName=data.pollName;
-			chartResults(data.pollName, data.results);
-			if (firstUpdate)
-			{	
-				$('#resultsChart').hide();
-				$('#resultsChart').slideDown();
-				firstUpdate=false;
-			}
-		}		
-	});
+	socket.on('authComplete', onAuthComplete);	
+	socket.on('pushedNewPoll', onPushedNewPoll);	
+	socket.on('pushResults', onPushedResults);
 }
-
 
 $(document).ready(function() 
 {	
@@ -142,14 +76,88 @@ $(document).ready(function()
 	});
 });
 
-function submitAuth()
+function setupEvents()
 {
-	sessionStorage.setItem("passwordMD5", hex_md5($("#password").val()));	
+	$("#btnLogin").off().click(submitAuth);		
+	$("#btnReAuth").off().click(submitAuth);	
+	$("#btnNewPoll").off().click(addNewPoll);
+	$("#btnAcceptPoll").off().click(createPoll);
+	$("#btnCancelPoll").off().click(hidePollPanel);
+	$("#optionsSlider").on("change", updateSliderText);
+	$("#optionsSlider" ).on("slide", updateSliderText);
+	$("#password").focus();
+	$("#password").select();
+}
+
+function onAuthComplete(data)
+{		
+	if (data.success)
+	{
+		$('#alertAuthError').slideUp();
+		$('#authPanel').slideUp();
+		$('#createPollRow').slideDown();
+		console.log("Lecturer has authenticated");						
+		$("#btnNewPoll").removeClass('ui-disabled');			
+		$("#btnReAuth").removeClass('ui-disabled');
+		$("#btnOpenLogin").slideUp();
+		loggedIn=true;
+	}
+	else
+	{
+		console.log("Lecturer has failed to be authenticated");
+		$('#alertAuthError').slideDown();
+		loggedIn=false;
+	}
+}
+
+function onPushedNewPoll(data)
+{
+	if (data.success)
+	{
+		console.log("Poll "+data.pollName+" has been pushed to students");			
+		$("#pollPanel").slideUp();
+		$('#resultsChart').slideUp();			
+		firstUpdate=true;
+		
+	}
+	else
+		console.log("Poll has not been pushed to students");					
+}
+
+function onPushedResults(data)
+{
+	var dataChanged=false;
+	for (var i=0;i<results.length;i++)
+	{
+		if (results[i]!=data.results[i])
+		{
+			dataChanged=true;
+			break;
+		}
+	}
+	
+	if (!pollName || data.pollName!=pollName || dataChanged)
+	{
+		results=data.results;
+		pollName=data.pollName;
+		chartResults(data.pollName, data.results);
+		if (firstUpdate)
+		{	
+			$('#resultsChart').hide();
+			$('#resultsChart').slideDown();
+			firstUpdate=false;
+		}
+	}		
+}
+
+function submitAuth()
+{	
+	sessionStorage.setItem("passwordMD5", hex_md5($("#password").val()));
 	var unhashedSalt=sessionStorage.getItem("passwordMD5")+salt;
-	console.log("Unhashed salt: "+unhashedSalt);		
+	console.log("Unhashed salt: "+unhashedSalt);
 	var saltedHash=hex_md5(unhashedSalt);
 	console.log("Salted Hash: "+saltedHash);
-	socket.emit('auth', {passwordMD5: saltedHash, courseCode: sessionStorage.getItem("courseCode")});	
+	socket.emit('auth', {passwordMD5: saltedHash, dept: dept, courseCode: sessionStorage.getItem("courseCode")});	
 }
 
 function addNewPoll()
@@ -174,16 +182,15 @@ function hidePollPanel()
 
 function createPoll()
 {
-	//$.mobile.loading( 'show');
 	console.log("Creating Poll");
 	var unhashedSalt=sessionStorage.getItem("passwordMD5")+salt;
 	console.log("Unhashed salt: "+unhashedSalt);
 	var saltedHash=hex_md5(unhashedSalt);
 	console.log("Salted Hash: "+saltedHash);
-	socket.emit('newPoll', {passwordMD5: saltedHash, courseCode: sessionStorage.getItem("courseCode"), pollName: $('#pollName').val(), numOptions: $('#optionsSlider').slider("option", "value") });
+	socket.emit('newPoll', {passwordMD5: saltedHash, dept: dept, courseCode: sessionStorage.getItem("courseCode"), pollName: $('#pollName').val(), numOptions: $('#optionsSlider').slider("option", "value") });
 }
 
-var updateRatingText = function (event, ui) {
+var updateSliderText = function (event, ui) {
 	$('#optionsCount').text(ui.value);	
 }
 
@@ -204,11 +211,10 @@ function chartResults(pollName, results)
 		y2: 1
 	};
 		
-		
     chart = new Highcharts.Chart({
         chart: {
             borderColor: '#000000',
-            borderWidth: 2,
+            borderWidth: 1,
             renderTo: 'resultsChart',                
             animation: true,
             type: 'column'
@@ -225,10 +231,10 @@ function chartResults(pollName, results)
         },
 		exporting: 
 		{
-            filename: 'PHY'+sessionStorage.courseCode+'_'+pollName
+            filename: sessionStorage.courseCode+'_'+pollName
         },
         subtitle: {            
-            text: 'PHY'+sessionStorage.courseCode,
+            text: sessionStorage.courseCode,
 			style:
 			{
 				fontSize: '150%'
@@ -290,7 +296,7 @@ function chartResults(pollName, results)
         plotOptions: 
         {
             series: {
-                borderWidth: 1,
+                borderWidth: 0,
                 borderColor: 'black',
                 animation: false
             },
@@ -302,53 +308,7 @@ function chartResults(pollName, results)
 				colorByPoint: true
             }			
         },		
-		colors: [{
-            linearGradient: perShapeGradient,
-            stops: [
-                [0, '#c1272d'],
-                [1, '#f1475d']
-                ]
-            }, {
-            linearGradient: perShapeGradient,
-            stops: [
-                [0, '#009245'],
-                [1, '#20a265']
-                ]
-            }, {			
-			linearGradient: perShapeGradient,
-            stops: [
-                [0, '#0071bc'],
-                [1, '#2091dc']
-                ]
-            }, {
-			linearGradient: perShapeGradient,
-            stops: [
-                [0, '#03070f'],
-                [1, '#03070f']
-                ]
-            }, {
-            linearGradient: perShapeGradient,
-            stops: [
-                [0, '#f7931e'],
-                [1, '#f7b33e']				
-                ]}, 
-			{
-            linearGradient: perShapeGradient,
-            stops: [
-                [0, '#aF00aF'],
-                [1, '#dF10dF']				
-                ]},
-			{linearGradient: perShapeGradient,
-            stops: [
-                [0, '#5E9AC4'],
-                [1, '#3D6FA2']				
-                ]},
-			{linearGradient: perShapeGradient,
-            stops: [
-                [0, '#FFEEA6'],
-                [1, '#FFE25C']				
-                ]}
-        ],
+		colors: ['#c1272d', '#009245', '#2091dc', '#03070f', '#f7931e', '#aF00aF', '#5e9ac4', '#ffe25c'],
         series: [{name: 'Votes',data: results}]
     });    
     chart.redraw();	

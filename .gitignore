@@ -164,3 +164,6 @@ pip-log.txt
 
 #node.js install modules
 node_modules/
+
+#secrets file
+secrets.json
