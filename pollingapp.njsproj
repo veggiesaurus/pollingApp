@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{17e727b2-f3ee-410d-85a4-1de086bd04ba}</ProjectGuid>
+    <ProjectHome />
+    <ProjectView>ShowAllFiles</ProjectView>
+    <StartupFile>index.js</StartupFile>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <StartWebBrowser>True</StartWebBrowser>
+    <LaunchUrl>http://localhost:3700/lecview/phy/1004w</LaunchUrl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include="package.json" />
+    <Content Include="secrets.json" />
+    <Content Include="README.md" />
+    <Compile Include="index.js" />
+    <Compile Include="public\lecturer.js" />
+    <Compile Include="public\student.js" />
+    <Content Include="secrets.json.EXAMPLE" />
+    <Content Include="tpl\layout.jade" />
+    <Content Include="tpl\lecturer.jade" />
+    <Content Include="tpl\student.jade" />
+    <Compile Include="public\jquery\jquery-1.11.2.min.js" />
+    <Compile Include="public\util\dateFormat.js" />
+    <Compile Include="public\util\md5-min.js" />
+    <Compile Include="public\util\slider.js" />
+    <Content Include="public\bootstrap\css\bootstrap-theme.css" />
+    <Content Include="public\bootstrap\css\bootstrap-theme.min.css" />
+    <Content Include="public\bootstrap\css\bootstrap.css" />
+    <Content Include="public\bootstrap\css\bootstrap.min.css" />
+    <Content Include="public\bootstrap\fonts\glyphicons-halflings-regular.svg" />
+    <Compile Include="public\bootstrap\js\bootstrap.js" />
+    <Compile Include="public\bootstrap\js\bootstrap.min.js" />
+    <Content Include="public\flat-ui\css\1modules_flat-ui.min.css" />
+    <Content Include="public\flat-ui\css\extra.css" />
+    <Content Include="public\flat-ui\css\flat-ui.min.css" />
+    <Content Include="public\flat-ui\css\modules_flat-ui.min.css" />
+    <Content Include="public\flat-ui\fonts\glyphicons-halflings-regular.svg" />
+    <Compile Include="public\flat-ui\js\flat-ui.min.js" />
+    <Compile Include="public\flat-ui\js\html5shiv.min..js" />
+    <Content Include="public\flat-ui\fonts\glyphicons\flat-ui-icons-regular.svg" />
+    <Content Include="public\flat-ui\fonts\glyphicons\selection.json" />
+    <Content Include="public\flat-ui\fonts\lato\lato-black.svg" />
+    <Content Include="public\flat-ui\fonts\lato\lato-bold.svg" />
+    <Content Include="public\flat-ui\fonts\lato\lato-bolditalic.svg" />
+    <Content Include="public\flat-ui\fonts\lato\lato-italic.svg" />
+    <Content Include="public\flat-ui\fonts\lato\lato-light.svg" />
+    <Content Include="public\flat-ui\fonts\lato\lato-regular.svg" />
+    <Compile Include="public\highcharts\js\highcharts-custom.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="public" />
+    <Folder Include="public\bootstrap" />
+    <Folder Include="public\bootstrap\css" />
+    <Folder Include="public\bootstrap\fonts" />
+    <Folder Include="public\bootstrap\js" />
+    <Folder Include="public\flat-ui" />
+    <Folder Include="public\flat-ui\css" />
+    <Folder Include="public\flat-ui\fonts" />
+    <Folder Include="public\flat-ui\fonts\glyphicons" />
+    <Folder Include="public\flat-ui\fonts\lato" />
+    <Folder Include="public\flat-ui\js" />
+    <Folder Include="public\highcharts" />
+    <Folder Include="public\highcharts\js" />
+    <Folder Include="public\jquery" />
+    <Folder Include="public\util" />
+    <Folder Include="sass" />
+    <Folder Include="tpl" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

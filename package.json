@@ -7,7 +7,7 @@
     "jade": "^1.9.2",    
     "shortid": "^2.2.2",
     "socket.io": "^1.1.0",
-	"mongoose": "3.8.26"
+	"mongoose": "3.9.7"
   },
   "author": "veggiesaurus",
   "contributors": [
