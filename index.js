@@ -2,14 +2,18 @@ var express = require("express");
 var http = require('http');
 var crypto = require('crypto');
 var shortId = require('shortid');
+var configs = require('./secrets.json');
+var mongoose = require('mongoose');
+
 var app = express();
 var server = http.Server(app);
 var io = require('socket.io')(server);
-var configs = require('./secrets.json');
+
 var port = 3700;
 var socketPort = 3701
 var uuidCounter=1040;
-var mapPolls={};
+var mapPolls = {};
+var mapDBPolls = {};
 var mapClients={};
 var mapTimers={};
 var mapResults={};
@@ -21,15 +25,6 @@ app.engine('jade', require('jade').__express);
 app.set('view options', { pretty: true });
 app.use(express.static(__dirname + '/public'));
 
-io.set('log level', 5);                    // reduce logging
-//production settings
-
-//io.enable('browser client minification');  // send minified client
-
-//io.enable('browser client etag');          // apply etag caching logic based on version number
-//io.enable('browser client gzip');          // gzip the file
-io.set('log level', 1);                    // reduce logging
-
 io.set('transports', ['websocket',                       
                       'htmlfile', 
                       'xhr-polling', 
@@ -37,6 +32,28 @@ io.set('transports', ['websocket',
                       'polling']);
 
 io.listen(socketPort);
+
+//database for metrics
+mongoose.connect('mongodb://localhost:27017/polling');
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function (callback) {
+    console.log("finished opening database!");    
+});
+
+
+//schemas for storing polls in hierachy: Depts -> Courses -> Polls
+
+var PollSchema = mongoose.Schema({
+    deptName: String,
+    courseCode: String,
+    roomId: { type: Number, min: -1, max: 10, default: -1 },
+    pollName: String,
+    numOptions: { type: Number, min: 2, max: 8 },
+    numResponses: { type: Number, default: 0 },
+    results: [Number]
+});
+
 app.get("/lecView/:dept/:id([0-9]+):courseType(w|f|h|s)(\/(:sub([0-9])))?", function(req, res)
 {
 	//Logging for debugging purposes
@@ -143,15 +160,44 @@ function addNewPoll(socket, data)
 		for (var i=0;i<results.length;i++)
 			results[i]=0;
 		mapResults[data.courseCode]={pollName:data.pollName, results:results};
-		
+        
+        //add entry to database
+        var Poll = mongoose.model('Poll', PollSchema);
+        var roomId = -1;
+        var courseCode = data.courseCode;
+        //get roomId and courseCode from concatenated course code
+        var splitCourseCode = data.courseCode.split("/");
+        if (splitCourseCode.length > 1) {
+            roomId = splitCourseCode[1];
+            courseCode = splitCourseCode[0];
+        }
+         
+        var poll = new Poll({ courseCode: courseCode, roomId: roomId, deptName: data.dept, pollName: data.pollName, numOptions: data.numOptions, results: results});
+        poll.save(function (err) {
+            if (err)
+                console.log(err.message);
+        });
+        
+        mapDBPolls[data.courseCode] = poll;
+
 		//callback timers		
 		if (mapTimers[data.courseCode])
 			clearTimeout(mapTimers[data.courseCode]);
 		mapTimers[data.courseCode]=setInterval(pushResults=function()
 		{	
 			//Logging for debugging purposes
-			//console.log("Pushing results of poll \""+mapResults[data.courseCode].pollName+"\"to lecturer");
-			io.sockets.in(data.courseCode+"_admin").emit('pushResults', mapResults[data.courseCode]);
+            //console.log("Pushing results of poll \""+mapResults[data.courseCode].pollName+"\"to lecturer");
+            var currentResults = mapResults[data.courseCode].results;
+            io.sockets.in(data.courseCode + "_admin").emit('pushResults', mapResults[data.courseCode]);
+            mapDBPolls[data.courseCode].results = currentResults;
+            var numResponses = 0;
+            for (var i = 0; i < currentResults.length; i++)
+                numResponses += currentResults[i];
+            mapDBPolls[data.courseCode].numResponses = numResponses;
+            mapDBPolls[data.courseCode].save(function (err) {
+                if (err)
+                    console.log(err.message);
+            });
 		}, 2000);
 		pushResults();
 	}
@@ -224,4 +270,4 @@ function getPasswordForDept(dept)
 
 server.listen(port, function(){
   console.log('listening on port '+port);
-});
+    });
