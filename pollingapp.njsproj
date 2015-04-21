@@ -18,6 +18,8 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Compile Include="public\metrics.js" />
+    <Compile Include="utils.js" />
     <Content Include="package.json" />
     <Content Include="secrets.json" />
     <Content Include="README.md" />
@@ -27,6 +29,7 @@
     <Content Include="secrets.json.EXAMPLE" />
     <Content Include="tpl\layout.jade" />
     <Content Include="tpl\lecturer.jade" />
+    <Content Include="tpl\metrics.jade" />
     <Content Include="tpl\student.jade" />
     <Compile Include="public\jquery\jquery-1.11.2.min.js" />
     <Compile Include="public\util\dateFormat.js" />
