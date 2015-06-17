@@ -31,7 +31,6 @@
     <Content Include="tpl\lecturer.jade" />
     <Content Include="tpl\metrics.jade" />
     <Content Include="tpl\student.jade" />
-    <Compile Include="public\jquery\jquery-1.11.2.min.js" />
     <Compile Include="public\util\dateFormat.js" />
     <Compile Include="public\util\md5-min.js" />
     <Compile Include="public\util\slider.js" />
