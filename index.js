@@ -249,20 +249,25 @@ mongo.connect(dbURL, function (err, db) {
             }
 
             socket.emit('authCompleteMetrics', { courseCode: data.courseCode, success: true });
-            getPolls(db, data.dept, courseCode, roomId, function (polls) {
+            getPolls(db, data.dept, courseCode, roomId, function (polls) {                
+                //create histograms and push to client
                 var dayOfWeekHist = [0,0,0,0,0,0,0];
                 var monthOfYearHist = [0,0,0,0,0,0,0,0,0,0,0,0];
+                var optionsHist = [0,0,0,0,0,0,0];
                 var deptHist = {};
                 var courseHist = {};
                 var roomHist = {};
+
                 for (var i = 0; i < polls.length; i++) {
-                    //get timing maps
+                    //fill timing hists
                     var pollTimestamp = polls[i]._id.getTimestamp();
                     var pollDay = pollTimestamp.getDay();
                     var pollMonth = pollTimestamp.getMonth();
                     dayOfWeekHist[pollDay]++;
                     monthOfYearHist[pollMonth]++;
-                    //init map elements if they're null
+                    //fill options and response hists
+
+                    //init map elements if they're null (course, dept & room hists)
                     if (!deptHist[polls[i].dept])
                         deptHist[polls[i].dept] = 0;
                     if (!courseHist[polls[i].courseCode])
