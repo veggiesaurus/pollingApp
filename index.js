@@ -5,15 +5,17 @@ var shortId = require('shortid');
 var configs = require('./secrets.json');
 var utils = require('./utils');
 var mongo = require('mongodb').MongoClient, assert = require('assert');
-var dbURL = 'mongodb://localhost:27017/polling';
+var dbURL = process.env.DB_URI || 'mongodb://localhost:27017/polling';
 var dbCollection = 'polls';
 
 var app = express();
 var server = http.Server(app);
 var io = require('socket.io')(server);
 
-var port = 3700;
-var socketPort = 3701
+var port=process.env.PORT || 80;
+
+var socketPort=process.env.SOCKET_PORT || 3701;
+
 var uuidCounter=1040;
 var mapPolls = {};
 var mapPollsDB = {};
@@ -48,8 +50,17 @@ mongo.connect(dbURL, function (err, db) {
 	    res.render("lecturer", {socketPort:socketPort, dept:req.params.dept, room:req.params.dept+req.params.id+req.params.courseType+(req.params.sub?req.params.sub:"")});
     });
 
+    app.get("/lecView/:id([0-9]+):courseType(w|f|h|s)(\/(:sub([0-9])))?", function(req, res)
+    {
+	    res.render("lecturer", {socketPort:socketPort, dept:'phy', room:'phy'+req.params.id+req.params.courseType+(req.params.sub?req.params.sub:"")});
+    });
+
     app.get("/:dept/:id([0-9]+):courseType(w|f|h|s)(\/(:sub([0-9])))?", function(req, res){	
 	    res.render("student", {socketPort:socketPort, room:req.params.dept+req.params.id+req.params.courseType+(req.params.sub?req.params.sub:"")});	
+    });
+
+    app.get("/:id([0-9]+):courseType(w|f|h|s)(\/(:sub([0-9])))?", function(req, res){	
+	    res.render("student", {socketPort:socketPort, room:'phy'+req.params.id+req.params.courseType+(req.params.sub?req.params.sub:"")});	
     });
        
     app.get("/", function(req, res){
@@ -290,9 +301,14 @@ mongo.connect(dbURL, function (err, db) {
         }
     }
 
-    server.listen(port, function(){
-      console.log('listening on port '+port);
-        });
+	if (process.env.LISTEN_HOST)
+		server.listen(port, process.env.LISTEN_HOST, function(){
+		console.log('Listening on port '+port+' and address '+process.env.LISTEN_HOST);
+	});
+	else
+		server.listen(port, function(){
+		console.log('Listening on port '+port);
+	});
 });
 
 
