@@ -167,3 +167,4 @@ node_modules/
 
 #secrets file
 secrets.json
+.ntvs_analysis.dat
