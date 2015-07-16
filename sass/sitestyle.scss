@@ -86,12 +86,19 @@
     }
     .slider-handle{
         background:darken(saturate($slider-color, 20), 29);
+        border-radius: 3px;
     }
     .slider-track-high{
 	    background: lighten($slider-color, 35);
         border-radius: $ui-border-radius;
     }
     width: 100%;
+}
+
+#sliderLabel{
+    .control-label{
+        font-size:120%;
+    }
 }
 
 #resultsRow{
