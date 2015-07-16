@@ -4,6 +4,7 @@ var path = require('path');
 var crypto = require('crypto');
 var shortId = require('shortid');
 var configs = require('./secrets.json');
+var favicon = require('serve-favicon');
 var utils = require('./utils');
 var mongo = require('mongodb').MongoClient, assert = require('assert');
 var dbURL = process.env.DB_URI || 'mongodb://localhost:27017/polling';
@@ -32,6 +33,7 @@ app.set('view engine', "jade");
 app.engine('jade', require('jade').__express);
 app.set('view options', { pretty: true });
 app.use(express.static(__dirname + '/public'));
+app.use(favicon(__dirname + '/public/images/favicon.png'));
 
 io.set('transports', ['websocket',                       
                       'htmlfile', 
