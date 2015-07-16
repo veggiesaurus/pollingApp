@@ -23,8 +23,10 @@ function initFunction()
 }
 
 
+
+
 window.onload = function() 
-{	
+{   
 	$('#alertAuthError').hide();
 	$("#btnNewPoll").addClass('ui-disabled');		
 	location.hash="";
@@ -33,15 +35,10 @@ window.onload = function()
 	host="http://"+window.location.hostname+":"+socketPort;
 	sessionStorage.setItem("courseCode", room.toUpperCase());
 	
-	if ($('#optionsSlider').length > 0) {
-		$('#optionsSlider').slider({
-			min: 2,
-			max: 8,
-			value: 4,
-			orientation: 'horizontal',
-			range: 'min'
-		}).addSliderSegments($('#optionsSlider').slider('option').max);
-	}
+    $("#options").slider();
+    $("#options").on("slide", function (slideEvt) {
+        $("#optionVal").text(slideEvt.value);
+    });
 	
 	setupEvents();
 	
@@ -187,7 +184,7 @@ function createPoll()
 	console.log("Unhashed salt: "+unhashedSalt);
 	var saltedHash=hex_md5(unhashedSalt);
 	console.log("Salted Hash: "+saltedHash);
-	socket.emit('newPoll', {passwordMD5: saltedHash, dept: dept, courseCode: sessionStorage.getItem("courseCode"), pollName: $('#pollName').val(), numOptions: $('#optionsSlider').slider("option", "value") });
+	socket.emit('newPoll', {passwordMD5: saltedHash, dept: dept, courseCode: sessionStorage.getItem("courseCode"), pollName: $('#pollName').val(), numOptions: $("#optionVal").text()});
 }
 
 var updateSliderText = function (event, ui) {
@@ -289,7 +286,7 @@ function chartResults(pollName, results)
             style: 
             {
                 color: '#333333',               
-                padding: '5px'
+                padding: '5px',
             }
             
         },
@@ -308,7 +305,7 @@ function chartResults(pollName, results)
 				colorByPoint: true
             }			
         },		
-		colors: ['#c1272d', '#009245', '#2091dc', '#03070f', '#f7931e', '#aF00aF', '#5e9ac4', '#ffe25c'],
+		colors: ['#c1272d', '#009245', '#2091dc', '#03070f', '#f7931e', '#aF00aF', '#5e9ac4', '#ffdc38'],
         series: [{name: 'Votes',data: results}]
     });    
     chart.redraw();	

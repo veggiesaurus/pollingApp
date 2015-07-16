@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "description": "Real time polling for UCT",
   "dependencies": {
+    "basic-auth": "^1.0.0",
     "express": "^4.12.3",
     "jade": "^1.9.2",
-    "shortid": "^2.2.2",
-    "socket.io": "^1.1.0",
     "mongodb": "^2.0.27",
-    "basic-auth": "^1.0.0"
+    "node-sass": "^3.2.0",
+    "node-sass-middleware": "^0.9.0",
+    "shortid": "^2.2.2",
+    "socket.io": "^1.1.0"
   },
   "author": "veggiesaurus",
   "contributors": [

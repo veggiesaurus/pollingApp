@@ -1,0 +1,133 @@
+// Import Bootstrap Compass integration
+@import "bootstrap-compass";
+// Import custom Bootstrap variables
+@import "variables_paper";
+// Import Bootstrap for Sass
+@import "bootstrap";
+@import "bootswatch_paper";
+@import "variables_site";
+
+@mixin panelColor($color){
+    border-color: $color;
+    .panel-heading{
+        background-color: $color;
+        border-color: $color;
+    }
+}
+
+@mixin alertColor($color){
+    border-color: $color;
+    background-color: $color;
+    border-color: $color;
+	span{
+		font-weight: bold;
+		color: white;
+	}
+}
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+
+.panel{
+    @if $ui-border-radius>0 { border-radius: $ui-border-radius+2;  }
+    @else {border-radius: $ui-border-radius};
+    .panel-heading{
+        color: white;
+        border-radius: $ui-border-radius;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}
+
+.panel-primary{@include panelColor($brand-primary);}
+.panel-warning{@include panelColor($brand-warning);}
+.panel-default{@include panelColor($brand-default);}
+.panel-danger{@include panelColor($brand-danger);}
+.panel-success{@include panelColor($brand-success);}
+.panel-inverse{@include panelColor($brand-inverse);}
+.panel-info{@include panelColor($brand-info);}
+.panel-disabled{@include panelColor($brand-disabled);}
+
+.alert{
+	border-radius: $ui-border-radius;	
+}
+.alert-primary{@include alertColor($brand-primary);}
+.alert-warning{@include alertColor($brand-warning);}
+.alert-default{@include alertColor($brand-default);}
+.alert-danger{@include alertColor($brand-danger);}
+.alert-success{@include alertColor($brand-success);}
+.alert-inverse{@include alertColor($brand-inverse);}
+.alert-info{@include alertColor($brand-info);}
+.alert-disabled{@include alertColor($brand-disabled);}
+
+.btn{
+    border-radius: $ui-border-radius;
+}
+
+.btn-A {@include button-variant(white, #c1272d, transparent);}
+.btn-B {@include button-variant(white, #009245, transparent);}
+.btn-C {@include button-variant(white, #2091dc, transparent);}
+.btn-D {@include button-variant(white, #220c1b, transparent);}
+.btn-E {@include button-variant(white, #f7931e, transparent);}
+.btn-F {@include button-variant(white, #aF00aF, transparent);}
+.btn-G {@include button-variant(white, #5E9AC4, transparent);}
+.btn-H {@include button-variant(white, #ffdc38, transparent);}
+
+.navbar{
+    border-radius: $ui-border-radius;
+}
+
+#optionsSlider{
+    .slider-selection {
+	    background: lighten($slider-color, 11);        
+        border-radius: $ui-border-radius;
+    }
+    .slider-handle{
+        background:darken(saturate($slider-color, 20), 29);
+    }
+    .slider-track-high{
+	    background: lighten($slider-color, 35);
+        border-radius: $ui-border-radius;
+    }
+    width: 100%;
+}
+
+#resultsRow{
+    font-size:120%;
+}
+
+#resultsChart, #deptDistChart, #courseDistChart, #roomDistChart, #dayOfWeekChart, #monthOfYearChart{
+    font-family:$font-family-base !important;
+}
+
+.bottom5 {margin-bottom: 5px;}
+.bottom7 {margin-bottom: 7px;}
+.bottom10 {margin-bottom: 10px;}
+.bottom15 {margin-bottom: 15px;}
+.bottom17 {margin-bottom: 17px;}
+.bottom30 {margin-bottom: 30px;}
+
+.top5 {margin-top: 5px;}
+.top7 {margin-top: 7px;}
+.top10 {margin-top: 10px;}
+.top15 {margin-top: 15px;}
+.top17 {margin-top: 17px;}
+.top30 {margin-top: 30px;}
+
+.pad1h {padding-right: 1px;padding-left: 1px;}
+.pad2h {padding-right: 2px;padding-left: 2px;}
+.pad5h {padding-right: 5px;padding-left: 5px;}
+.pad7h {padding-right: 7px;padding-left: 7px;}
+.pad10h {padding-right: 10px;padding-left: 10px;}
+.pad15h {padding-right: 15px;padding-left: 15px;}
+.pad30h {padding-right: 30px;padding-left: 30px;}
+
+.pad1v {padding-top: 1px;padding-bottom: 1px;}
+.pad2v {padding-top: 2px;padding-bottom: 2px;}
+.pad5v {padding-top: 5px;padding-bottom: 5px;}
+.pad7v {padding-top: 7px;padding-bottom: 7px;}
+.pad10v {padding-top: 10px;padding-bottom: 10px;}
+.pad15v {padding-top: 15px;padding-bottom: 15px;}
+.pad30h {padding-top: 30px;padding-bottom: 30px;}

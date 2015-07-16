@@ -6,9 +6,9 @@ block headerScripts
 		socketPort="#{socketPort}";
 		dept="#{dept}";
 	script(src='http://code.highcharts.com/highcharts.js')
-	script(src='/util/dateFormat.js')
-	script(src='/util/md5-min.js')
-	script(src='/metrics.js')
+	script(src='/js/util/dateFormat.js')
+	script(src='/js/util/md5-min.js')
+	script(src='/js/metrics.js')
 block content
 	div(class='navbar navbar-default', role = 'navigation')
 		.container
@@ -28,7 +28,7 @@ block content
 							.col-xs-8
 								input#password(class='form-control', type="password",placeholder="Password")
 							.col-xs-4
-								button#btnLogin(class='btn btn-info btn-block')
+								button#btnLogin(class='btn btn-primary btn-block')
 									|Login
 		.row
 			.col-xs-12

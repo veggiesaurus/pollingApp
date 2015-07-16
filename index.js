@@ -1,5 +1,6 @@
 var express = require("express");
 var http = require('http');
+var path = require('path');
 var crypto = require('crypto');
 var shortId = require('shortid');
 var configs = require('./secrets.json');
@@ -11,6 +12,7 @@ var dbCollection = 'polls';
 var app = express();
 var server = http.Server(app);
 var io = require('socket.io')(server);
+var sassMiddleware = require('node-sass-middleware');
 
 var port=process.env.PORT || 80;
 
@@ -38,6 +40,18 @@ io.set('transports', ['websocket',
                       'polling']);
 
 io.listen(socketPort);
+
+//sass config
+app.use(sassMiddleware({
+    /* Options */
+    src: path.join(__dirname, 'sass'),
+    dest: path.join(__dirname, 'public/css'),
+    debug: true,
+    outputStyle: 'compressed',
+    response: true,
+    prefix: '/css'
+}));
+
 
 //database for metrics
 mongo.connect(dbURL, function (err, db) {

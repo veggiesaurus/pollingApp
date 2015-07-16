@@ -5,66 +5,65 @@ block headerScripts
 		room="#{room}";
 		socketPort="#{socketPort}";
 		dept="#{dept}";
-	script(src='/highcharts/js/highcharts-custom.js')
-	script(src='/util/dateFormat.js')
-	script(src='/util/slider.js')
-	script(src='/util/md5-min.js')
-	script(src='/lecturer.js')
+	script(src='/js/lib/highcharts/highcharts-custom.js')
+	script(src='/js/util/dateFormat.js')
+	//script(src='/js/util/slider.js')
+	script(src='/js/util/md5-min.js')
+	script(src='/js/lecturer.js')
 block content
-	div(class='navbar navbar-default', role = 'navigation')
+	.navbar.navbar-inverse(role = 'navigation')
 		.container
 			.navbar-header
 				.navbar-brand
-					span(class='glyphicon glyphicon-pencil pad10h')
+					span.glyphicon.glyphicon-pencil.pad10h
 					|UCT QuickPoll (Admin)
 	.container
 		.row
 			.col-xs-12
-				#authPanel(class='panel panel-primary')
+				#authPanel.panel.panel-primary
 					.panel-heading
 						h3.panel-title
 							|Login
 					.panel-body
 						.row
 							.col-xs-8
-								input#password(class='form-control', type="password",placeholder="Password")
+								input#password.form-control(type="password",placeholder="Password")
 							.col-xs-4
-								button#btnLogin(class='btn btn-info btn-block')
+								button.btn.btn-block.btn-primary#btnLogin
 									|Login
 		.row
 			.col-xs-12
-				#alertAuthError(class='alert alert-danger', role='alert', style='display:none')
-					span(class='glyphicon glyphicon-remove pad7h')
+				#alertAuthError.alert.alert-danger(role='alert', style='display:none')
+					span.glyphicon.glyphicon-remove.pad10h
 					span
 						|Authentication error	
 	.container-fluid
 		.row
-			div(class='col-xs-12 bottom15')
+			.col-xs-12.bottom15
 				#resultsChart(data-role='content')
 	.container
-		#createPollRow(class='row pad10v', style='display:none')
-			div(class='col-sm-4 col-md-2 col-xs-6')			
-				button#btnNewPoll(class='btn btn-success btn-block') Create new poll
-			div(class='col-sm-4 col-md-2 col-xs-6')
-				button#btnReAuth(class='btn btn-info btn-block') Re-authenticate		
+		#createPollRow.row.pad10v(style='display:none')
+			.col-sm-4.col-md-2.col-xs-6
+				button#btnNewPoll.btn.btn-block.btn-success Create new poll
+			.col-xs-6.col-sm-4.col-md-2
+				button#btnReAuth.btn.btn-block.btn-warning Re-authenticate		
 		.row
 			.col-xs-12
-				#pollPanel(class='panel panel-primary', style='display:none')
+				#pollPanel.panel.panel-primary(style='display:none')
 					.panel-heading
 						h3.panel-title Create new poll
 					.panel-body
 						.row
 							.col-xs-12
-								input#pollName(class='form-control', placeholder="Poll Name")
+								input#pollName.form-control(placeholder="Poll Name")
+						.row.pad10v
+							#sliderLabel.col-xs-12.col-sm-3.col-md-3.col-lg-2
+								.control-label Number of options: 
+									span#optionVal 4
+							.col-xs-12.col-sm-9.col-md-9.col-lg-10
+								input#options(data-slider-id='optionsSlider',type="text",data-slider-min="2",data-slider-max="8",data-slider-step="1",data-slider-value="4" data-slider-tooltip="hide" data-slider-handle="square")
 						.row
-							label(for='optionsSlider', class='col-xs-12 col-sm-3 col-md-3 col-lg-2 control-label') 
-								|Number of options: 
-								span#optionsCount
-									|4
-							div(class='col-lg-10 col-md-9 col-sm-9 col-xs-12 pad7v')
-								#optionsSlider(class='ui-slider')
-						.row
-							div(class='col-sm-4 col-md-2 col-xs-6')
-								button#btnAcceptPoll(class='btn btn-success btn-block') Create
-							div(class='col-sm-4 col-md-2 col-xs-6')
-								button#btnCancelPoll(class='btn btn-danger btn-block') Cancel
+							.col-xs-6.col-md-2.col-sm-4
+								button#btnAcceptPoll.btn.btn-block.btn-success Create
+							.col.xs-6.col-md-2.col-sm-4
+								button#btnCancelPoll.btn.btn-block.btn-danger Cancel

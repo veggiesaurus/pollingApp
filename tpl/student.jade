@@ -3,28 +3,28 @@ block headerScripts
 	script.
 		room="#{room}";
 		socketPort="#{socketPort}"
-	script(src='/student.js')
+	script(src='/js/student.js')
 block content
-	div(class='navbar navbar-default', role = 'navigation')
+	.navbar.navbar-inverse(role = 'navigation')
 		.container
 			.navbar-header
 				.navbar-brand
-					span(class='glyphicon glyphicon-pencil pad10h')
+					span.glyphicon.glyphicon-pencil.pad10h
 					|UCT QuickPoll
 	.container
 		.row
 			.col-xs-12
-				#pollPanel(class='panel panel-primary', style='display:none')
+				#pollPanel.panel.panel-primary(style='display:none')
 					.panel-heading
 						h3.panel-title
 							span#pollHeading
 								No Poll
 					.panel-body
 						div#poll
-		.row
+		#resultsRow.row
 			.col-xs-12
-				#alertStudentWaiting(class='alert alert-info', role='alert', style='display:none')
-					span(class='glyphicon glyphicon-time pad7h')
+				#alertStudentWaiting.alert.alert-primary(role='alert', style='display:none')
+					span.glyphicon.glyphicon-time.pad7h
 					span
 						|Waiting for a new poll
 				#alertStudentSubmitted(class='alert alert-success', role='alert', style='display:none')
