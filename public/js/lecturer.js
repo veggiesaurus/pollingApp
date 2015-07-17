@@ -210,8 +210,9 @@ function chartResults(pollName, results)
 		
     chart = new Highcharts.Chart({
         chart: {
-            borderColor: '#000000',
-            borderWidth: 1,
+            borderColor: '#b2dbfb',
+            borderWidth: 2,
+            borderRadius: 3,
             renderTo: 'resultsChart',                
             animation: true,
             type: 'column'
@@ -268,7 +269,8 @@ function chartResults(pollName, results)
                 style: {
                     fontSize: '150%'
                 }
-            }
+            },
+            allowDecimals: false,
         },
         tooltip: 
         {
