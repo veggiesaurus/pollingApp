@@ -10,45 +10,43 @@ block headerScripts
 	script(src='/js/util/md5-min.js')
 	script(src='/js/metrics.js')
 block content
-	div(class='navbar navbar-default', role = 'navigation')
+	.navbar.navbar-inverse(role = 'navigation')
 		.container
 			.navbar-header
 				.navbar-brand
-					span(class='glyphicon glyphicon-pencil pad10h')
+					span.glyphicon.glyphicon-pencil.pad10h
 					|UCT QuickPoll (Metrics)
 	.container
 		.row
 			.col-xs-12
-				#authPanel(class='panel panel-primary')
+				#authPanel.panel.panel-primary
 					.panel-heading
-						h3.panel-title
-							|Login
+						h3.panel-title Login
 					.panel-body
 						.row
 							.col-xs-8
-								input#password(class='form-control', type="password",placeholder="Password")
+								input#password.form-control(type="password",placeholder="Password")
 							.col-xs-4
-								button#btnLogin(class='btn btn-primary btn-block')
-									|Login
+								button#btnLogin.btn.btn-block.btn-primary Login
 		.row
 			.col-xs-12
-				#alertAuthError(class='alert alert-danger', role='alert', style='display:none')
-					span(class='glyphicon glyphicon-remove pad7h')
+				#alertAuthError.alert.alert-danger(role='alert', style='display:none')
+					span.glyphicon.glyphicon-remove.pad7h
 					span
 						|Authentication error	
 	.container-fluid
 		.row
-			div(class='col-xs-12 bottom15')
+			.col-xs-12.bottom15
 				#deptDistChart(data-role='content')
 		.row
-			div(class='col-xs-12 bottom15')
+			.col-xs-12.bottom15
 				#courseDistChart(data-role='content')
 		.row
-			div(class='col-xs-12 bottom15')
+			.col-xs-12.bottom15
 				#roomDistChart(data-role='content')
 		.row
-			div(class='col-xs-12 bottom15')
+			.col-xs-12.bottom15
 				#dayOfWeekChart(data-role='content')
 		.row
-			div(class='col-xs-12 bottom15')
+			.col-xs-12.bottom15
 				#monthOfYearChart(data-role='content')

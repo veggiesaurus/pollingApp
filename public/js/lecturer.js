@@ -215,7 +215,10 @@ function chartResults(pollName, results)
             borderRadius: 3,
             renderTo: 'resultsChart',                
             animation: true,
-            type: 'column'
+            type: 'column',
+            style: {
+                fontFamily: '"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif'
+            }
         }, 
 		credits: {
             enabled: false

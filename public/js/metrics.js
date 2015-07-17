@@ -131,7 +131,16 @@ function chartMonthlyDistributionBar(dist) {
         totalPolls += dist[i];
     $('#monthOfYearChart').highcharts({
         chart: {
-            type: 'column'
+            type: 'column',
+            style: {
+                fontFamily: '"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif'
+            },
+            borderColor: '#b2dbfb',
+            borderWidth: 2,
+            borderRadius: 3,
+        },
+        credits: {
+            enabled: false
         },
         title: {
             text: 'Monthly distribution: ' + totalPolls + ' polls'
@@ -180,7 +189,16 @@ function chartDistributionPie(element, titleText, data) {
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
-            plotShadow: false
+            plotShadow: false,
+            style: {
+                fontFamily: '"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif'
+            },
+            borderColor: '#b2dbfb',
+            borderWidth: 2,
+            borderRadius: 3,
+        },
+        credits: {
+            enabled: false
         },
         title: {
             text: titleText
