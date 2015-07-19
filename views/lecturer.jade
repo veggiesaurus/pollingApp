@@ -7,7 +7,6 @@ block headerScripts
 		dept="#{dept}";
 	script(src='/js/lib/highcharts/highcharts-custom.js')
 	script(src='/js/util/dateFormat.js')
-	//script(src='/js/util/slider.js')
 	script(src='/js/util/md5-min.js')
 	script(src='/js/lecturer.js')
 block content
@@ -34,9 +33,26 @@ block content
 		.row
 			.col-xs-12
 				#alertAuthError.alert.alert-danger(role='alert', style='display:none')
-					span.glyphicon.glyphicon-remove.pad10h
 					span
-						|Authentication error	
+						|Authentication error
+		if displayDeptErr
+			.row
+				.col-xs-12
+					#alertDeptError.alert.alert-danger(role='alert')
+						p 
+							|Please note that UCT QuickPoll now supports multiple departments. If you are not part of the UCT Physics department, please see the 
+							a(href="/") home page 
+							|for details. Your URL should take the form 
+						p
+							small
+								code /lecview/{yourDepartmentName}/{courseCode} 
+						p If you have not set up a departmental password, please contact the polling app administrator 
+							a(href="mailto:cmrang001@myuct.ac.za?Subject=Request%20for%20departmental%20polling%20password.") (cmrang001@myuct.ac.za). 
+						
+		.row
+			.col-xs-12
+				#alertRedirectError.alert.alert-warning(role='alert', style='display:none')
+					The UCT QuickPoll domain has changed to polling.uct.ac.za. Please adjust your URL accordingly in future. 
 	.container-fluid
 		.row
 			.col-xs-12.bottom15

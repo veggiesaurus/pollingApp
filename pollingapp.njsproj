@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{17e727b2-f3ee-410d-85a4-1de086bd04ba}</ProjectGuid>
     <ProjectHome />
-    <ProjectView>ShowAllFiles</ProjectView>
+    <ProjectView>ProjectFiles</ProjectView>
     <StartupFile>index.js</StartupFile>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -28,6 +28,10 @@
     <Compile Include="public\js\util\dateFormat.js" />
     <Compile Include="public\js\util\md5-min.js" />
     <Compile Include="public\js\util\slider.js" />
+    <Compile Include="routes\lecturer.js" />
+    <Compile Include="routes\metrics.js" />
+    <Compile Include="routes\redirects.js" />
+    <Compile Include="routes\student.js" />
     <Compile Include="utils.js" />
     <Content Include="package.json" />
     <Content Include="public\css\bootstrap-slider.min.css" />
@@ -46,12 +50,15 @@
     <Content Include="public\fonts\icomoon.svg" />
     <Content Include="public\fonts\icomoon.ttf" />
     <Content Include="public\fonts\icomoon.woff" />
+    <Content Include="public\images\favicon.png" />
     <Content Include="sass\sitestyle.scss" />
+    <Content Include="sass\_variables_paper.scss" />
     <Content Include="sass\_variables_site.scss" />
     <Content Include="secrets.json" />
     <Content Include="README.md" />
     <Compile Include="index.js" />
     <Content Include="secrets.json.EXAMPLE" />
+    <Content Include="tpl\home.jade" />
     <Content Include="tpl\layout.jade" />
     <Content Include="tpl\lecturer.jade" />
     <Content Include="tpl\metrics.jade" />
@@ -64,6 +71,7 @@
     <Folder Include="public" />
     <Folder Include="public\css\" />
     <Folder Include="public\fonts\" />
+    <Folder Include="public\images\" />
     <Folder Include="public\js\" />
     <Folder Include="public\js\lib\" />
     <Folder Include="public\js\lib\bootstrap\" />
@@ -71,6 +79,7 @@
     <Folder Include="public\js\lib\jquery\" />
     <Folder Include="public\js\util\" />
     <Folder Include="public\util" />
+    <Folder Include="routes\" />
     <Folder Include="sass" />
     <Folder Include="tpl" />
   </ItemGroup>

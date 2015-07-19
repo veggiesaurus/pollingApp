@@ -28,7 +28,7 @@ var mapTimersDB={};
 var mapResults={};
 var mapSalts={};
 				 
-app.set('views', __dirname + '/tpl');
+app.set('views', __dirname + '/views');
 app.set('view engine', "jade");
 app.engine('jade', require('jade').__express);
 app.set('view options', { pretty: true });

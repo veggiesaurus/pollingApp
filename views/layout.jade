@@ -9,6 +9,12 @@ html
 		script(src='/js/util/bootstrap-slider.min.js')
 		script(src='/socket.io/socket.io.js')
 		block headerScripts
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-	body(class="ui-mobile-viewport ui-overlay-c")
+		meta(name="viewport" content="width=device-width, initial-scale=1")
+	body
 		block content
+
+		footer.footer
+			.container
+				p
+					small
+						| Developed for UCT Physics by Angus Comrie

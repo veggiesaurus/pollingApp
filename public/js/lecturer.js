@@ -90,7 +90,8 @@ function onAuthComplete(data)
 {		
 	if (data.success)
 	{
-		$('#alertAuthError').slideUp();
+        $('#alertAuthError').slideUp();
+        $('#alertDeptError').slideUp();        
 		$('#authPanel').slideUp();
 		$('#createPollRow').slideDown();
 		console.log("Lecturer has authenticated");						

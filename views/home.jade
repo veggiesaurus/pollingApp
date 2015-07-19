@@ -1,0 +1,45 @@
+extends layout
+	
+block content
+	.navbar.navbar-inverse(role = 'navigation')
+		.container
+			.navbar-header
+				.navbar-brand
+					span.glyphicon.glyphicon-pencil
+					|UCT QuickPoll
+	.container
+		#howtoPanel.panel.panel-primary
+			.panel-heading How to use QuickPoll
+			.panel-body
+				p 
+					| The UCT QuickPoll webapp allows lecturers to gain rapid feedback during lectures. It is designed to be simple for students to use, and easy to set up.
+					| QuickPoll supports polls with between 2 and 8 options (labelled as A/1 through H/8).
+					| Lecturers can set up their own polls by logging in using the following URL format (appended to this page's address):
+				p
+					small
+						code /lecview/{deptName}/{courseCode}
+				small
+					p
+						| (e.g. PHY1004W uses the following lecturer URL: 
+						code polling.uct.ac.za/lecview/phy/1004w
+						| )
+				p
+					| Before using QuckPoll for the first time, please contact the app administrator 
+					a(href="mailto:cmrang001@myuct.ac.za?Subject=Request%20for%20departmental%20polling%20password.") (cmrang001@myuct.ac.za)
+					| , in order to determine your departmental QuickPoll password. 
+					| Students do not need to log in in order to respond to the polls. You should direct them to the relevant URL, of the form:
+				p
+					small
+						code /{deptName}/{courseCode}
+				small
+					p
+						| (e.g. PHY1004W uses the following student URL: 
+						code polling.uct.ac.za/phy/1004w
+						| )
+				p
+					| If multiple lecturers want to use QuckPoll simultaneously with the same course code, they should append a sub-room to both the lecturer and student URLs.
+				small
+					p
+						| (e.g. PHY10013S uses the following student URL for sub-room 1: 
+						code polling.uct.ac.za/phy/1013s/1
+						| )

@@ -2,10 +2,10 @@
 @import "bootstrap-compass";
 // Import custom Bootstrap variables
 @import "variables_paper";
+@import "variables_site";
 // Import Bootstrap for Sass
 @import "bootstrap";
 @import "bootswatch_paper";
-@import "variables_site";
 
 @mixin panelColor($color){
     border-color: $color;
@@ -19,10 +19,41 @@
     border-color: $color;
     background-color: $color;
     border-color: $color;
-	span{
-		font-weight: bold;
-		color: white;
-	}
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  margin-bottom: 25px;
+}
+
+.navbar{
+    border-radius: 0px;    
+}
+
+.navbar-brand{
+    font-size: 20px;
+    padding-top:12px;
+    .glyphicon{
+        margin-right: 5px;
+        top: 2px;
+    }        
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 25px;
+    background-color: lighten($brand-primary, 40);
+    p {
+        text-align: center;
+        color: darken($brand-primary, 10);
+        margin-bottom: 0px;
+    }
 }
 
 .col-centered{
@@ -51,7 +82,9 @@
 .panel-disabled{@include panelColor($brand-disabled);}
 
 .alert{
-	border-radius: $ui-border-radius;	
+    span{
+		color: white;
+	}
 }
 .alert-primary{@include alertColor($brand-primary);}
 .alert-warning{@include alertColor($brand-warning);}
@@ -62,10 +95,6 @@
 .alert-info{@include alertColor($brand-info);}
 .alert-disabled{@include alertColor($brand-disabled);}
 
-.btn{
-    border-radius: $ui-border-radius;
-}
-
 .btn-A {@include button-variant(white, #c1272d, transparent);}
 .btn-B {@include button-variant(white, #009245, transparent);}
 .btn-C {@include button-variant(white, #2091dc, transparent);}
@@ -74,10 +103,6 @@
 .btn-F {@include button-variant(white, #aF00aF, transparent);}
 .btn-G {@include button-variant(white, #5E9AC4, transparent);}
 .btn-H {@include button-variant(white, #ffdc38, transparent);}
-
-.navbar{
-    border-radius: $ui-border-radius;
-}
 
 #optionsSlider{
     .slider-selection {
