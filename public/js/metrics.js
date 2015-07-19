@@ -62,20 +62,27 @@ function onAuthCompleteMetrics(data) {
 
 function onPushedMetrics(data)
 {
-    //only plot dept distribution if we aren't looking at a specific dept
-    if (data.deptHist && !data.dept)
-        chartDeptDistributionPie(data.deptHist);
-    //only plot course distribution if we aren't looking at a specific course
-    if (data.courseHist && !data.courseCode)
-        chartCourseDistributionPie(data.courseHist);
-    //only plot room distribution if we ARE looking at a specific course AND there's more than one room
-    if (data.roomHist && data.courseCode && Object.keys(data.roomHist).length>1)
-        chartRoomDistributionPie(data.roomHist);
-
-    if (data.dayOfWeekHist)
-        chartDailyDistributionPie(data.dayOfWeekHist);
-    if (data.monthOfYearHist)
-        chartMonthlyDistributionBar(data.monthOfYearHist);
+    if (data.err) {
+        console.log(err);
+        $('#alertDBError').slideDown();
+    }
+    else {
+        $('#alertDBError').slideUp();
+        //only plot dept distribution if we aren't looking at a specific dept
+        if (data.deptHist && !data.dept)
+            chartDeptDistributionPie(data.deptHist);
+        //only plot course distribution if we aren't looking at a specific course
+        if (data.courseHist && !data.courseCode)
+            chartCourseDistributionPie(data.courseHist);
+        //only plot room distribution if we ARE looking at a specific course AND there's more than one room
+        if (data.roomHist && data.courseCode && Object.keys(data.roomHist).length > 1)
+            chartRoomDistributionPie(data.roomHist);
+        
+        if (data.dayOfWeekHist)
+            chartDailyDistributionPie(data.dayOfWeekHist);
+        if (data.monthOfYearHist)
+            chartMonthlyDistributionBar(data.monthOfYearHist);
+    }
 }
 
 function chartDailyDistributionPie(dist) {

@@ -60,45 +60,18 @@ mongo.connect(dbURL, function (err, db) {
     assert.equal(null, err);
     console.log("Connected correctly to server");
     createIndices(db);
-             
-    app.get("/lecView/:dept/:id([0-9]+):courseType(w|f|h|s)(\/(:sub([0-9])))?", function(req, res)
-    {
-	    res.render("lecturer", {socketPort:socketPort, dept:req.params.dept, room:req.params.dept+req.params.id+req.params.courseType+(req.params.sub?req.params.sub:"")});
-    });
-
-    app.get("/lecView/:id([0-9]+):courseType(w|f|h|s)(\/(:sub([0-9])))?", function(req, res)
-    {
-	    res.render("lecturer", {socketPort:socketPort, dept:'phy', room:'phy'+req.params.id+req.params.courseType+(req.params.sub?req.params.sub:"")});
-    });
-
-    app.get("/:dept/:id([0-9]+):courseType(w|f|h|s)(\/(:sub([0-9])))?", function(req, res){	
-	    res.render("student", {socketPort:socketPort, room:req.params.dept+req.params.id+req.params.courseType+(req.params.sub?req.params.sub:"")});	
-    });
-
-    app.get("/:id([0-9]+):courseType(w|f|h|s)(\/(:sub([0-9])))?", function(req, res){	
-	    res.render("student", {socketPort:socketPort, room:'phy'+req.params.id+req.params.courseType+(req.params.sub?req.params.sub:"")});	
-    });
-       
+      
+    require('./routes/redirects')(app);
+    require('./routes/lecturer')(app, socketPort);
+    require('./routes/student')(app, socketPort);
+    require('./routes/metrics')(app, socketPort);
+    
     app.get("/", function(req, res){
-	    res.render("student");
+	    res.render("home");
     });
     
-    app.get("/metrics/:dept/:id([0-9]+):courseType(w|f|h|s)(\/(:sub([0-9])))?", function (req, res) {        
-        res.render("metrics", { socketPort: socketPort, dept: req.params.dept, room: req.params.dept + req.params.id + req.params.courseType + (req.params.sub?req.params.sub:"")});                
-    });
-    
-    app.get("/metrics/:dept", function (req, res) {
-        res.render("metrics", { socketPort: socketPort, dept: req.params.dept});
-    });
-    
-    app.get("/metrics", function (req, res) {
-        res.render("metrics", { socketPort: socketPort});
-    });
-
-
     io.sockets.on('connection', function (socket) 
     {
-	    console.log("Client connected. Waiting for course code or auth");
 	    mapSalts[socket.id]=Math.floor((Math.random()*2000000)+1);
 	    socket.emit('connectionSuccess', {salt:mapSalts[socket.id]});
 	    //callbacks	
@@ -117,14 +90,9 @@ mongo.connect(dbURL, function (err, db) {
 		    var courseCode=data.courseCode.toUpperCase();		
 		    var uuid=data.uuid;
 		    if (!isValidUUID(uuid))
-		    {
 			    uuid=shortId.generate();
-			    console.log("new uuid: "+uuid);
-		    }
-		    else
-			    console.log("valid uuid: "+uuid);
-		    console.log("Client (" + uuid+") has been placed in room: "+courseCode);
-		    socket.join(courseCode);
+            
+            socket.join(courseCode);
 		    socket.emit('joinedRoom', {roomName:courseCode, uuid: uuid, success: true});
 		    //check if there is a current poll and the client hasn't already responsed to it
 		    if (mapPolls[courseCode] && !mapPolls[courseCode].submittedClients[uuid])
@@ -136,9 +104,7 @@ mongo.connect(dbURL, function (err, db) {
     {			
 	    var deptPasswordMD5=getPasswordForDept(data.dept);
 	    var unhashedSalt=deptPasswordMD5+mapSalts[socket.id];
-	    console.log("Unhashed salt: "+unhashedSalt);
 	    var saltedHash=crypto.createHash('md5').update(unhashedSalt).digest("hex");
-	    console.log("Salted Hash: "+saltedHash);
 	    if (deptPasswordMD5 && data.passwordMD5==saltedHash)
 	    {
 		    data.courseCode=data.courseCode.toUpperCase();
@@ -148,14 +114,12 @@ mongo.connect(dbURL, function (err, db) {
 	    }
 	    else
 	    {
-		    console.log("Authentication error");
 		    socket.emit('authComplete', {courseCode:data.courseCode, success: false});
 	    }
     }
 
     function addNewPoll(socket, data)
     {	
-	    console.log("Recieved new poll: %j", data);
 	    if (data.dept && data.courseCode)
 		    data.courseCode=data.courseCode.toUpperCase();
 	    else
@@ -173,7 +137,7 @@ mongo.connect(dbURL, function (err, db) {
 		    socket.join(data.courseCode+"_admin");
 		
 		    //emit poll to everyone else
-		    console.log("Pushing new poll to students: "+data.pollName);
+		    console.log(data.courseCode+": Pushing new poll to students: "+data.pollName);
 		    mapPolls[data.courseCode]={pollName: data.pollName, numOptions:data.numOptions, submittedClients:{}};
 		    io.sockets.in(data.courseCode).emit('pushNewPoll', {pollName: data.pollName, numOptions:data.numOptions});
 		
@@ -203,12 +167,19 @@ mongo.connect(dbURL, function (err, db) {
                 courseCode = splitCourseCode[0];
             }
             
-            insertPoll(db, data.dept, courseCode, roomId, data.pollName, data.numOptions, function (pollId) {
-                mapPollsDB[data.courseCode] = pollId;
-                mapTimersDB[data.courseCode] = setInterval(updateDB=function () {
-                    //database update
-                    updatePoll(db, mapPollsDB[data.courseCode], mapResults[data.courseCode].results);                    
-                }, 5000);                
+            insertPoll(db, data.dept, courseCode, roomId, data.pollName, data.numOptions, function (err, pollId) {
+                if (err)
+                    console.log(err);
+                else {
+                    mapPollsDB[data.courseCode] = pollId;
+                    mapTimersDB[data.courseCode] = setInterval(updateDB = function () {
+                        //database update
+                        updatePoll(db, mapPollsDB[data.courseCode], mapResults[data.courseCode].results, function (err, data) { 
+                            if (err)
+                                console.log(err);
+                        });
+                    }, 5000);
+                }
             });
           
 		    mapTimers[data.courseCode]=setInterval(pushResults=function()
@@ -221,14 +192,12 @@ mongo.connect(dbURL, function (err, db) {
 	    {
 		    //emit failure to lecturer
 		    socket.emit('pushedNewPoll', {pollName: data.pollName, success: false});
-		    console.log("Failed to push poll: "+data.pollName);
 	    }
     }
     
     function onPollSubmission(socket, data) {
         if (data.courseCode)
             data.courseCode = data.courseCode.toUpperCase();
-        console.log("Recieved new poll reply");
         
         if (!data.courseCode || !data.pollName || !data.submission) {
             console.log("Invalid poll reply: missing data");
@@ -259,9 +228,7 @@ mongo.connect(dbURL, function (err, db) {
     function onAuthMetrics(socket, data) {
         var deptPasswordMD5 = getPasswordForDept(data.dept);
         var unhashedSalt = deptPasswordMD5 + mapSalts[socket.id];
-        console.log("Unhashed salt: " + unhashedSalt);
         var saltedHash = crypto.createHash('md5').update(unhashedSalt).digest("hex");
-        console.log("Salted Hash: " + saltedHash);
         if (deptPasswordMD5 && data.passwordMD5 == saltedHash) {
             data.courseCode = data.courseCode.toUpperCase();            
             console.log("Observer has authenticated for metrics (dept: " + data.dept?data.dept:'*' + ", course: " + data.courseCode?data.courseCode:'*');
@@ -276,38 +243,44 @@ mongo.connect(dbURL, function (err, db) {
             }
 
             socket.emit('authCompleteMetrics', { courseCode: data.courseCode, success: true });
-            getPolls(db, data.dept, courseCode, roomId, function (polls) {                
-                //create histograms and push to client
-                var dayOfWeekHist = [0,0,0,0,0,0,0];
-                var monthOfYearHist = [0,0,0,0,0,0,0,0,0,0,0,0];
-                var optionsHist = [0,0,0,0,0,0,0];
-                var deptHist = {};
-                var courseHist = {};
-                var roomHist = {};
-
-                for (var i = 0; i < polls.length; i++) {
-                    //fill timing hists
-                    var pollTimestamp = polls[i]._id.getTimestamp();
-                    var pollDay = pollTimestamp.getDay();
-                    var pollMonth = pollTimestamp.getMonth();
-                    dayOfWeekHist[pollDay]++;
-                    monthOfYearHist[pollMonth]++;
-                    //fill options and response hists
-
-                    //init map elements if they're null (course, dept & room hists)
-                    if (!deptHist[polls[i].dept])
-                        deptHist[polls[i].dept] = 0;
-                    if (!courseHist[polls[i].courseCode])
-                        courseHist[polls[i].courseCode] = 0;                   
-                    if (!roomHist[polls[i].roomId])
-                        roomHist[polls[i].roomId] = 0;
-                    //increment maps
-                    deptHist[polls[i].dept]++;
-                    courseHist[polls[i].courseCode]++;
-                    roomHist[polls[i].roomId]++;
+            getPolls(db, data.dept, courseCode, roomId, function (err, polls) {
+                if (err) {
+                    console.log(err);
+                    socket.emit('pushedMetrics', { err: err });
                 }
-                //push to client                
-                socket.emit('pushedMetrics', { dept: data.dept, courseCode: data.courseCode, dayOfWeekHist: dayOfWeekHist, monthOfYearHist: monthOfYearHist, deptHist: deptHist, courseHist: courseHist, roomHist: roomHist});
+                else {
+                    //create histograms and push to client
+                    var dayOfWeekHist = [0, 0, 0, 0, 0, 0, 0];
+                    var monthOfYearHist = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                    var optionsHist = [0, 0, 0, 0, 0, 0, 0];
+                    var deptHist = {};
+                    var courseHist = {};
+                    var roomHist = {};
+                    
+                    for (var i = 0; i < polls.length; i++) {
+                        //fill timing hists
+                        var pollTimestamp = polls[i]._id.getTimestamp();
+                        var pollDay = pollTimestamp.getDay();
+                        var pollMonth = pollTimestamp.getMonth();
+                        dayOfWeekHist[pollDay]++;
+                        monthOfYearHist[pollMonth]++;
+                        //fill options and response hists
+                        
+                        //init map elements if they're null (course, dept & room hists)
+                        if (!deptHist[polls[i].dept])
+                            deptHist[polls[i].dept] = 0;
+                        if (!courseHist[polls[i].courseCode])
+                            courseHist[polls[i].courseCode] = 0;
+                        if (!roomHist[polls[i].roomId])
+                            roomHist[polls[i].roomId] = 0;
+                        //increment maps
+                        deptHist[polls[i].dept]++;
+                        courseHist[polls[i].courseCode]++;
+                        roomHist[polls[i].roomId]++;
+                    }
+                    //push to client                
+                    socket.emit('pushedMetrics', { dept: data.dept, courseCode: data.courseCode, dayOfWeekHist: dayOfWeekHist, monthOfYearHist: monthOfYearHist, deptHist: deptHist, courseHist: courseHist, roomHist: roomHist });
+                }
             });
             
         }
@@ -361,31 +334,42 @@ function createIndices(db) {
 //Write
 //
 
-function insertPoll(db, dept, courseCode, roomId, pollName, numOptions, callback) {
+function insertPoll(db, dept, courseCode, roomId, pollName, numOptions, done) {
+    if (!db)
+        return done({ name: 'DB Error', message: 'The connection to the database has been lost.' });
     var collection = db.collection(dbCollection);
+    if (!collection)
+        return done({ name: 'DB Error', message: 'The database collection is missing or invalid.' });
     collection.insert({ dept: dept.toLowerCase(), courseCode: courseCode.toLowerCase(), roomId: roomId, pollName: pollName, numOptions: numOptions, numResponses: 0, entries: new Array(numOptions) }, function (err, result) {
-        assert.equal(err, null);
-        console.log("inserted poll into collection");
-        callback(result.ops[0]._id);   
+        if (err)
+            done(err);
+        else {
+            done(null, result.ops[0]._id);
+        }
     });    
 }
 
-function updatePoll(db, pollId, entries, callback) {
+function updatePoll(db, pollId, entries, done) {
     var numResponses = 0;
     for (var i = 0; i < entries.length; i++)
         numResponses += entries[i];
+    if (!db)
+        return done({ name: 'DB Error', message: 'The connection to the database has been lost.' });
     var collection = db.collection(dbCollection);
-    collection.updateOne({_id: pollId}, { $set: { numResponses: numResponses, entries: entries }}, function (err, result) {
-        assert.equal(err, null);
-        if (callback)
-            callback(result);
+    if (!collection)
+        return done({ name: 'DB Error', message: 'The database collection is missing or invalid.' });
+    collection.updateOne({ _id: pollId }, { $set: { numResponses: numResponses, entries: entries } }, function (err, result) {
+        if (err)
+            done(err);
+        else
+            done(null, result);
     });    
 }
 
 //Query
 //
 
-function getPolls(db, dept, courseCode, roomId, callback) {
+function getPolls(db, dept, courseCode, roomId, done) {
     var query = {};
     if (dept)
         query.dept = dept.toLowerCase();
@@ -394,10 +378,10 @@ function getPolls(db, dept, courseCode, roomId, callback) {
     if (roomId)
         query.roomId = roomId;
     var collection = db.collection(dbCollection);
-    console.log(query);
-    collection.find(query).toArray(function (err, docs) {
-        assert.equal(null, err);
-        if (callback)
-            callback(docs);
+    collection.find(query).toArray(function (err, result) {
+        if (err)
+            done(err);
+        else
+            done(null, result);
     });
 }
