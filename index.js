@@ -251,18 +251,49 @@ mongo.connect(dbURL, function (err, db) {
                 else {
                     //create histograms and push to client
                     var dayOfWeekHist = [0, 0, 0, 0, 0, 0, 0];
+                    var dayOfWeekResponseHist = [0, 0, 0, 0, 0, 0, 0];
                     var monthOfYearHist = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                     var optionsHist = [0, 0, 0, 0, 0, 0, 0];
                     var deptHist = {};
                     var courseHist = {};
                     var roomHist = {};
-                    
+                    var lecturePeriodHist = [0, 0, 0, 0, 0, 0, 0, 0];
+                    var lecturePeriodResponseHist = [0, 0, 0, 0, 0, 0, 0, 0];
                     for (var i = 0; i < polls.length; i++) {
+                        var pollResponses = polls[i].numResponses;
                         //fill timing hists
                         var pollTimestamp = polls[i]._id.getTimestamp();
                         var pollDay = pollTimestamp.getDay();
                         var pollMonth = pollTimestamp.getMonth();
+                        //simplifies comparisons considerably
+                        var pollTime = pollTimestamp.getHours()+0.01*pollTimestamp.getMinutes();
+                        var pollPeriod;
+                        if (pollTime<7.30 || pollTime > 15.45)
+                            pollPeriod = -1;
+                        else if (pollTime<=8.45)
+                            pollPeriod=0;
+                        else if (pollTime<=9.45)
+                            pollPeriod=1;
+                        else if (pollTime<=10.45)
+                            pollPeriod=2;
+                        else if (pollTime<=11.45)
+                            pollPeriod=3;
+                        else if (pollTime<=12.45)
+                            pollPeriod=4;
+                        else if (pollTime<=13.45)
+                            pollPeriod=5;
+                        else if (pollTime<=14.45)
+                            pollPeriod=6;
+                        else if (pollTime<=15.45)
+                            pollPeriod=7;
+                        
+                        if (pollPeriod>=0){
+                            lecturePeriodHist[pollPeriod]++;
+                            lecturePeriodResponseHist[pollPeriod]+=pollResponses;
+                        }
+                        
                         dayOfWeekHist[pollDay]++;
+                        dayOfWeekResponseHist[pollDay]+=pollResponses;
                         monthOfYearHist[pollMonth]++;
                         //fill options and response hists
                         
@@ -278,8 +309,16 @@ mongo.connect(dbURL, function (err, db) {
                         courseHist[polls[i].courseCode]++;
                         roomHist[polls[i].roomId]++;
                     }
+                    for (var i in lecturePeriodHist){
+                        if (lecturePeriodHist[i]>0)
+                            lecturePeriodResponseHist[i]/=lecturePeriodHist[i];
+                    }
+                    for (var i in dayOfWeekHist){
+                        if (dayOfWeekHist[i]>0)
+                            dayOfWeekResponseHist[i]/=dayOfWeekHist[i];
+                    }
                     //push to client                
-                    socket.emit('pushedMetrics', { dept: data.dept, courseCode: data.courseCode, dayOfWeekHist: dayOfWeekHist, monthOfYearHist: monthOfYearHist, deptHist: deptHist, courseHist: courseHist, roomHist: roomHist });
+                    socket.emit('pushedMetrics', { dept: data.dept, courseCode: data.courseCode, lecturePeriodHist: lecturePeriodHist, lecturePeriodResponseHist: lecturePeriodResponseHist, dayOfWeekHist: dayOfWeekHist, dayOfWeekResponseHist: dayOfWeekResponseHist, monthOfYearHist: monthOfYearHist, deptHist: deptHist, courseHist: courseHist, roomHist: roomHist });
                 }
             });
             

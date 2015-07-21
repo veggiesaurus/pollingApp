@@ -77,19 +77,43 @@ function onPushedMetrics(data)
         //only plot room distribution if we ARE looking at a specific course AND there's more than one room
         if (data.roomHist && data.courseCode && Object.keys(data.roomHist).length > 1)
             chartRoomDistributionPie(data.roomHist);
-        
+        if (data.lecturePeriodHist)
+            chartPeriodDistributionPie(data.lecturePeriodHist);
+        if (data.lecturePeriodResponseHist)
+            chartPeriodResponseBar(data.lecturePeriodResponseHist);
         if (data.dayOfWeekHist)
             chartDailyDistributionPie(data.dayOfWeekHist);
+        if (data.dayOfWeekResponseHist)
+            chartDayOfWeekResponseBar(data.dayOfWeekResponseHist);
         if (data.monthOfYearHist)
             chartMonthlyDistributionBar(data.monthOfYearHist);
     }
+}
+
+function chartPeriodDistributionPie(dist){
+    if (dist.length != 8)
+        return;
+    var totalPolls = 0;
+    for (var i in dist)
+        totalPolls += dist[i];
+    var titleText = 'Lecture period distribution: ' + totalPolls + ' polls';
+    var element = '#lecturePeriodChart';
+    var data = [['1st', dist[0]],
+                ['2nd', dist[1]],
+                ['3rd', dist[2]],
+                ['4th', dist[3]],
+                ['5th', dist[4]],
+                ['Meridian', dist[5]],
+                ['6th', dist[6]],
+                ['7th', dist[7]]];    
+    chartDistributionPie(element, titleText, data);
 }
 
 function chartDailyDistributionPie(dist) {
     if (dist.length != 7)
         return;
     var totalPolls = 0;
-    for (var i = 0; i < 7; i++)
+    for (var i in dist)
         totalPolls += dist[i];
     var titleText = 'Daily distribution: ' + totalPolls + ' polls';
     var element = '#dayOfWeekChart';
@@ -119,7 +143,7 @@ function chartRoomDistributionPie(roomHist) {
     
     //Reformat room names
     var data = transformMap(roomHist);
-    for (var i = 0; i < data.length; i++) {
+    for (var i in data) {
         if (data[i][0] == '-1') {
             data[i][0] = 'General';
         }
@@ -128,6 +152,114 @@ function chartRoomDistributionPie(roomHist) {
     }
 
     chartDistributionPie('#roomDistChart', titleText, data);
+}
+
+function chartPeriodResponseBar(dist) {
+    if (dist.length != 8)
+        return;
+    $('#lecturePeriodResponseChart').highcharts({
+        chart: {
+            type: 'column',
+            style: {
+                fontFamily: '"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif'
+            },
+            borderColor: '#b2dbfb',
+            borderWidth: 2,
+            borderRadius: 3,
+        },
+        credits: {
+            enabled: false
+        },
+        title: {
+            text: 'Average student response by lecture period'
+        },        
+        xAxis: {
+            categories: [
+                '1st',
+                '2nd',
+                '3rd',
+                '4th',
+                '5th',
+                'Meridian',
+                '6th',
+                '7th'
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Number of polls'
+            }
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.y}</b>'
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: 'Polls',
+            data: dist
+        }]
+    });
+}
+
+
+function chartDayOfWeekResponseBar(dist) {
+    if (dist.length != 7)
+        return;
+    $('#dayOfWeekResponseChart').highcharts({
+        chart: {
+            type: 'column',
+            style: {
+                fontFamily: '"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif'
+            },
+            borderColor: '#b2dbfb',
+            borderWidth: 2,
+            borderRadius: 3,
+        },
+        credits: {
+            enabled: false
+        },
+        title: {
+            text: 'Average student response by day of the week'
+        },        
+        xAxis: {
+            categories: [
+                'Sun',
+                'Mon',
+                'Tues',
+                'Wed',
+                'Thurs',
+                'Fri',
+                'Sat'
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Number of polls'
+            }
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.y}</b>'
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: 'Polls',
+            data: dist
+        }]
+    });
 }
 
 function chartMonthlyDistributionBar(dist) {
