@@ -6,7 +6,7 @@
     <ProjectGuid>{17e727b2-f3ee-410d-85a4-1de086bd04ba}</ProjectGuid>
     <ProjectHome />
     <ProjectView>ProjectFiles</ProjectView>
-    <StartupFile>index.js</StartupFile>
+    <StartupFile>server.js</StartupFile>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
@@ -32,6 +32,7 @@
     <Compile Include="routes\metrics.js" />
     <Compile Include="routes\redirects.js" />
     <Compile Include="routes\student.js" />
+    <Compile Include="server.js" />
     <Compile Include="utils.js" />
     <Content Include="package.json" />
     <Content Include="public\css\bootstrap-slider.min.css" />
@@ -56,7 +57,6 @@
     <Content Include="sass\_variables_site.scss" />
     <Content Include="secrets.json" />
     <Content Include="README.md" />
-    <Compile Include="index.js" />
     <Content Include="secrets.json.EXAMPLE" />
     <Content Include="public\util\dateFormat.js" />
     <Content Include="public\util\md5-min.js" />
