@@ -270,21 +270,21 @@ mongo.connect(dbURL, function (err, db) {
                         var pollPeriod;
                         if (pollTime<7.30 || pollTime > 15.45)
                             pollPeriod = -1;
-                        else if (pollTime<=8.45)
+                        else if (pollTime<8.45)
                             pollPeriod=0;
-                        else if (pollTime<=9.45)
+                        else if (pollTime<9.45)
                             pollPeriod=1;
-                        else if (pollTime<=10.45)
+                        else if (pollTime<10.45)
                             pollPeriod=2;
-                        else if (pollTime<=11.45)
+                        else if (pollTime<11.45)
                             pollPeriod=3;
-                        else if (pollTime<=12.45)
+                        else if (pollTime<12.45)
                             pollPeriod=4;
-                        else if (pollTime<=13.45)
+                        else if (pollTime<13.45)
                             pollPeriod=5;
-                        else if (pollTime<=14.45)
+                        else if (pollTime<14.45)
                             pollPeriod=6;
-                        else if (pollTime<=15.45)
+                        else if (pollTime<15.45)
                             pollPeriod=7;
                         
                         if (pollPeriod>=0){
