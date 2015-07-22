@@ -63,7 +63,7 @@ function onAuthCompleteMetrics(data) {
 function onPushedMetrics(data)
 {
     if (data.err) {
-        console.log(err);
+        console.log(data.err);
         $('#alertDBError').slideDown();
     }
     else {
@@ -80,13 +80,13 @@ function onPushedMetrics(data)
         if (data.lecturePeriodHist)
             chartPeriodDistributionPie(data.lecturePeriodHist);
         if (data.lecturePeriodResponseHist)
-            chartPeriodResponseBar(data.lecturePeriodResponseHist);
+            chartPeriodResponseBar(data.lecturePeriodResponseHist, data.lecturePeriodResponseErr);
         if (data.dayOfWeekHist)
             chartDailyDistributionPie(data.dayOfWeekHist);
         if (data.dayOfWeekResponseHist)
-            chartDayOfWeekResponseBar(data.dayOfWeekResponseHist);
+            chartDayOfWeekResponseBar(data.dayOfWeekResponseHist, data.dayOfWeekResponseErr);
         if (data.monthOfYearHist)
-            chartMonthlyDistributionBar(data.monthOfYearHist);
+            chartMonthlyDistributionBar(data.monthOfYearHist, data.monthOfYearErr);
     }
 }
 
@@ -154,123 +154,34 @@ function chartRoomDistributionPie(roomHist) {
     chartDistributionPie('#roomDistChart', titleText, data);
 }
 
-function chartPeriodResponseBar(dist) {
+function chartPeriodResponseBar(dist, distErr) {
     if (dist.length != 8)
-        return;
-    $('#lecturePeriodResponseChart').highcharts({
-        chart: {
-            type: 'column',
-            style: {
-                fontFamily: '"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif'
-            },
-            borderColor: '#b2dbfb',
-            borderWidth: 2,
-            borderRadius: 3,
-        },
-        credits: {
-            enabled: false
-        },
-        title: {
-            text: 'Average student response by lecture period'
-        },        
-        xAxis: {
-            categories: [
-                '1st',
-                '2nd',
-                '3rd',
-                '4th',
-                '5th',
-                'Meridian',
-                '6th',
-                '7th'
-            ],
-            crosshair: true
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: 'Number of polls'
-            }
-        },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.y}</b>'
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: [{
-            name: 'Polls',
-            data: dist
-        }]
-    });
+        return;    
+    chartHistogramBar('#lecturePeriodResponseChart', 'Average student response by lecture period', 'Responses', ['1st','2nd','3rd','4th','5th','Meridian','6th','7th'], 'Number of responses', dist, distErr);
 }
 
-
-function chartDayOfWeekResponseBar(dist) {
+function chartDayOfWeekResponseBar(dist, distErr) {    
     if (dist.length != 7)
-        return;
-    $('#dayOfWeekResponseChart').highcharts({
-        chart: {
-            type: 'column',
-            style: {
-                fontFamily: '"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif'
-            },
-            borderColor: '#b2dbfb',
-            borderWidth: 2,
-            borderRadius: 3,
-        },
-        credits: {
-            enabled: false
-        },
-        title: {
-            text: 'Average student response by day of the week'
-        },        
-        xAxis: {
-            categories: [
-                'Sun',
-                'Mon',
-                'Tues',
-                'Wed',
-                'Thurs',
-                'Fri',
-                'Sat'
-            ],
-            crosshair: true
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: 'Number of polls'
-            }
-        },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.y}</b>'
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: [{
-            name: 'Polls',
-            data: dist
-        }]
-    });
+        return;    
+    chartHistogramBar('#dayOfWeekResponseChart', 'Average student response by day of the week', 'Responses', ['Sun','Mon','Tues','Wed','Thurs','Fri','Sat'], 'Number of responses', dist, distErr);
 }
 
-function chartMonthlyDistributionBar(dist) {
+function chartMonthlyDistributionBar(dist, distErr) {
     if (dist.length != 12)
         return;
     var totalPolls = 0;
     for (var i = 0; i < 12; i++)
         totalPolls += dist[i];
-    $('#monthOfYearChart').highcharts({
-        chart: {
-            type: 'column',
+    
+    chartHistogramBar('#monthOfYearChart', 'Monthly distribution: ' + totalPolls + ' polls', 'Polls', ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], 'Number of polls', dist, distErr, 0);       
+}
+
+function chartHistogramBar(element, titleText, seriesName, categories, yTitle, dist, distErr, numDecimals) {
+    var series= [{name: seriesName, type: 'column', data: dist}];
+    if (distErr)
+        series.push({name: 'err', type:'errorbar', data: distErr, enableMouseTracking: false});
+    $(element).highcharts({
+        chart: {            
             style: {
                 fontFamily: '"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif'
             },
@@ -282,33 +193,24 @@ function chartMonthlyDistributionBar(dist) {
             enabled: false
         },
         title: {
-            text: 'Monthly distribution: ' + totalPolls + ' polls'
+            text: titleText
         },        
         xAxis: {
-            categories: [
-                'Jan',
-                'Feb',
-                'Mar',
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec'
-            ],
+            categories:categories,
             crosshair: true
         },
         yAxis: {
             min: 0,
             title: {
-                text: 'Number of polls'
+                text: yTitle
             }
         },
+        legend: {
+            enabled: false
+        },		
         tooltip: {
-            pointFormat: '{series.name}: <b>{point.y}</b>'
+            pointFormat: '{series.name}: <b>{point.y}</b>',
+            valueDecimals: (numDecimals != undefined)?numDecimals: 1
         },
         plotOptions: {
             column: {
@@ -316,11 +218,8 @@ function chartMonthlyDistributionBar(dist) {
                 borderWidth: 0
             }
         },
-        series: [{
-            name: 'Polls',
-            data: dist
-        }]
-    });
+        series: series
+    });    
 }
 
 function chartDistributionPie(element, titleText, data) {

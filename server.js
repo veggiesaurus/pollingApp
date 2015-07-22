@@ -252,6 +252,9 @@ mongo.connect(dbURL, function (err, db) {
                     //create histograms and push to client
                     var dayOfWeekHist = [0, 0, 0, 0, 0, 0, 0];
                     var dayOfWeekResponseHist = [0, 0, 0, 0, 0, 0, 0];
+                    var dayOfWeekResponseSqHist = [0, 0, 0, 0, 0, 0, 0];
+                    var dayOfWeekResponseErr = [[], [], [], [], [], [], []];
+                    
                     var monthOfYearHist = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                     var optionsHist = [0, 0, 0, 0, 0, 0, 0];
                     var deptHist = {};
@@ -259,6 +262,8 @@ mongo.connect(dbURL, function (err, db) {
                     var roomHist = {};
                     var lecturePeriodHist = [0, 0, 0, 0, 0, 0, 0, 0];
                     var lecturePeriodResponseHist = [0, 0, 0, 0, 0, 0, 0, 0];
+                    var lecturePeriodResponseSqHist = [0, 0, 0, 0, 0, 0, 0, 0];
+                    var lecturePeriodResponseErr = [[], [], [], [], [], [], [], []];
                     for (var i = 0; i < polls.length; i++) {
                         var pollResponses = polls[i].numResponses;
                         //fill timing hists
@@ -290,10 +295,12 @@ mongo.connect(dbURL, function (err, db) {
                         if (pollPeriod>=0){
                             lecturePeriodHist[pollPeriod]++;
                             lecturePeriodResponseHist[pollPeriod]+=pollResponses;
+                            lecturePeriodResponseSqHist[pollPeriod]+=pollResponses*pollResponses;
                         }
                         
                         dayOfWeekHist[pollDay]++;
                         dayOfWeekResponseHist[pollDay]+=pollResponses;
+                        dayOfWeekResponseSqHist[pollDay]+=pollResponses*pollResponses;
                         monthOfYearHist[pollMonth]++;
                         //fill options and response hists
                         
@@ -310,15 +317,35 @@ mongo.connect(dbURL, function (err, db) {
                         roomHist[polls[i].roomId]++;
                     }
                     for (var i in lecturePeriodHist){
-                        if (lecturePeriodHist[i]>0)
-                            lecturePeriodResponseHist[i]/=lecturePeriodHist[i];
+                        if (lecturePeriodHist[i]>0){
+                             var N = lecturePeriodHist[i];
+                            lecturePeriodResponseHist[i]/=N;
+                            lecturePeriodResponseSqHist[i]/=N;
+                            var mu = lecturePeriodResponseHist[i];
+                            var ssx = lecturePeriodResponseSqHist[i]
+                            var stdDev = Math.sqrt(ssx-mu*mu)/Math.sqrt(N);
+                            lecturePeriodResponseErr[i] = [mu-stdDev, mu+stdDev];
+                        }
+                        else
+                            lecturePeriodResponseErr[i] = [0,0];
+                        
                     }
                     for (var i in dayOfWeekHist){
-                        if (dayOfWeekHist[i]>0)
-                            dayOfWeekResponseHist[i]/=dayOfWeekHist[i];
+                        if (dayOfWeekHist[i]>0){
+                            var N = dayOfWeekHist[i];
+                            dayOfWeekResponseHist[i]/=N;                            
+                            dayOfWeekResponseSqHist[i]/=N;
+                            var mu = dayOfWeekResponseHist[i];
+                            var ssx = dayOfWeekResponseSqHist[i]
+                            var stdDev = Math.sqrt(ssx-mu*mu)/Math.sqrt(N);
+                            dayOfWeekResponseErr[i] = [mu-stdDev, mu+stdDev];
+                        }
+                        else
+                            dayOfWeekResponseErr[i] = [0,0];
+                        
                     }
                     //push to client                
-                    socket.emit('pushedMetrics', { dept: data.dept, courseCode: data.courseCode, lecturePeriodHist: lecturePeriodHist, lecturePeriodResponseHist: lecturePeriodResponseHist, dayOfWeekHist: dayOfWeekHist, dayOfWeekResponseHist: dayOfWeekResponseHist, monthOfYearHist: monthOfYearHist, deptHist: deptHist, courseHist: courseHist, roomHist: roomHist });
+                    socket.emit('pushedMetrics', { dept: data.dept, courseCode: data.courseCode, lecturePeriodHist: lecturePeriodHist, lecturePeriodResponseHist: lecturePeriodResponseHist, lecturePeriodResponseErr: lecturePeriodResponseErr, dayOfWeekHist: dayOfWeekHist, dayOfWeekResponseHist: dayOfWeekResponseHist, dayOfWeekResponseErr: dayOfWeekResponseErr, monthOfYearHist: monthOfYearHist, deptHist: deptHist, courseHist: courseHist, roomHist: roomHist });
                 }
             });
             
