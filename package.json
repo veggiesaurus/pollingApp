@@ -24,7 +24,7 @@
     "type": "git",
     "subdomain": "uctphysics-polling",
     "scripts": {
-      "start": "node index.js"
+      "start": "node server.js"
     },
     "url": "https://github.com/veggiesaurus/phyPollingApp.git"
   }

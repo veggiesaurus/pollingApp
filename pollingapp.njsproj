@@ -28,6 +28,7 @@
     <Content Include="public\js\util\dateFormat.js" />
     <Content Include="public\js\util\md5-min.js" />
     <Content Include="public\js\util\slider.js" />
+    <Compile Include="metrics.js" />
     <Compile Include="routes\lecturer.js" />
     <Compile Include="routes\metrics.js" />
     <Compile Include="routes\redirects.js" />
