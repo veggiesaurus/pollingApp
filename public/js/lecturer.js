@@ -36,8 +36,8 @@ window.onload = function()
 	sessionStorage.setItem("courseCode", room.toUpperCase());
 	
     $("#options").slider();
-    $("#options").on("slide", function (slideEvt) {
-        $("#optionVal").text(slideEvt.value);
+    $("#options").on("change", function (changeEvt) {
+        $("#optionVal").text(changeEvt.value.newValue);
     });
 	
 	setupEvents();
@@ -80,8 +80,6 @@ function setupEvents()
 	$("#btnNewPoll").off().click(addNewPoll);
 	$("#btnAcceptPoll").off().click(createPoll);
 	$("#btnCancelPoll").off().click(hidePollPanel);
-	$("#optionsSlider").on("change", updateSliderText);
-	$("#optionsSlider" ).on("slide", updateSliderText);
 	$("#password").focus();
 	$("#password").select();
 }
@@ -186,10 +184,6 @@ function createPoll()
 	var saltedHash=hex_md5(unhashedSalt);
 	console.log("Salted Hash: "+saltedHash);
 	socket.emit('newPoll', {passwordMD5: saltedHash, dept: dept, courseCode: sessionStorage.getItem("courseCode"), pollName: $('#pollName').val(), numOptions: $("#optionVal").text()});
-}
-
-var updateSliderText = function (event, ui) {
-	$('#optionsCount').text(ui.value);	
 }
 
 function chartResults(pollName, results)
