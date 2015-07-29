@@ -19,7 +19,7 @@ var port=process.env.PORT || 80;
 
 var socketPort=process.env.SOCKET_PORT || 3701;
 
-var uuidCounter=1040;
+var uuidCounter=1040; 
 var mapPolls = {};
 var mapPollsDB = {};
 var mapClients={};
@@ -255,7 +255,16 @@ mongo.connect(dbURL, function (err, db) {
 					var dayOfWeekResponseSqHist = [0, 0, 0, 0, 0, 0, 0];
 					var dayOfWeekResponseErr = [[], [], [], [], [], [], []];
 					
-					var monthOfYearHist = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+					var weekOfYearHist = [];
+					var weekOfYearResponseHist = [];
+					var weekOfYearResponseSqHist = [];
+					var weekOfYearResponseErr = [];
+
+					var monthOfYearHist = [];
+					var monthOfYearResponseHist = [];
+					var monthOfYearResponseSqHist = [];
+					var monthOfYearResponseErr = [];
+
 					var optionsHist = [0, 0, 0, 0, 0, 0, 0];
 					var deptHist = {};
 					var courseHist = {};
@@ -270,6 +279,7 @@ mongo.connect(dbURL, function (err, db) {
 						var pollTimestamp = polls[i]._id.getTimestamp();
 						var pollDay = pollTimestamp.getDay();
 						var pollMonth = pollTimestamp.getMonth();
+						var pollWeek = utils.getWeekOfYear(pollTimestamp);
 						//simplifies comparisons considerably
 						var pollTime = pollTimestamp.getHours()+0.01*pollTimestamp.getMinutes();
 						var pollPeriod;
@@ -300,10 +310,27 @@ mongo.connect(dbURL, function (err, db) {
 						
 						dayOfWeekHist[pollDay]++;
 						dayOfWeekResponseHist[pollDay]+=pollResponses;
-						dayOfWeekResponseSqHist[pollDay]+=pollResponses*pollResponses;
-						monthOfYearHist[pollMonth]++;
-						//fill options and response hists
+						dayOfWeekResponseSqHist[pollDay] += pollResponses * pollResponses;
 						
+						if (!weekOfYearHist[pollWeek]) {
+							weekOfYearHist[pollWeek] = 0;
+							weekOfYearResponseHist[pollWeek] = 0;
+							weekOfYearResponseSqHist[pollWeek] = 0;
+						}
+						weekOfYearHist[pollWeek]++;
+						weekOfYearResponseHist[pollWeek] += pollResponses;
+						weekOfYearResponseSqHist[pollWeek] += pollResponses * pollResponses;
+						
+						if (!monthOfYearHist[pollMonth]) {
+							monthOfYearHist[pollMonth] = 0;
+							monthOfYearResponseHist[pollMonth] = 0;
+							monthOfYearResponseSqHist[pollMonth] = 0;
+						}
+						monthOfYearHist[pollMonth]++;
+						monthOfYearResponseHist[pollMonth] += pollResponses;
+						monthOfYearResponseSqHist[pollMonth] += pollResponses * pollResponses;
+
+						//fill options and response hists						
 						//init map elements if they're null (course, dept & room hists)
 						if (!deptHist[polls[i].dept])
 							deptHist[polls[i].dept] = 0;
@@ -316,6 +343,8 @@ mongo.connect(dbURL, function (err, db) {
 						courseHist[polls[i].courseCode]++;
 						roomHist[polls[i].roomId]++;
 					}
+					
+					//Statistics
 					for (var i in lecturePeriodHist){
 						if (lecturePeriodHist[i]>0){
 							 var N = lecturePeriodHist[i];
@@ -328,8 +357,8 @@ mongo.connect(dbURL, function (err, db) {
 						}
 						else
 							lecturePeriodResponseErr[i] = [0,0];
-						
 					}
+
 					for (var i in dayOfWeekHist){
 						if (dayOfWeekHist[i]>0){
 							var N = dayOfWeekHist[i];
@@ -342,10 +371,45 @@ mongo.connect(dbURL, function (err, db) {
 						}
 						else
 							dayOfWeekResponseErr[i] = [0,0];
-						
 					}
+					
+					for (var i in weekOfYearHist) {
+						if (weekOfYearHist[i] > 0) {
+							var N = weekOfYearHist[i];
+							weekOfYearResponseHist[i] /= N;
+							weekOfYearResponseSqHist[i] /= N;
+							var mu = weekOfYearResponseHist[i];
+							var ssx = weekOfYearResponseSqHist[i]
+							var stdDev = Math.sqrt(ssx - mu * mu) / Math.sqrt(N);
+							weekOfYearResponseErr[i] = [mu - stdDev, mu + stdDev];
+						}
+						else
+							weekOfYearResponseErr[i] = [0, 0];
+					}
+					
+					for (var i in monthOfYearHist) {
+						if (monthOfYearHist[i] > 0) {
+							var N = monthOfYearHist[i];
+							monthOfYearResponseHist[i] /= N;
+							monthOfYearResponseSqHist[i] /= N;
+							var mu = monthOfYearResponseHist[i];
+							var ssx = monthOfYearResponseSqHist[i]
+							var stdDev = Math.sqrt(ssx - mu * mu) / Math.sqrt(N);
+							monthOfYearResponseErr[i] = [mu - stdDev, mu + stdDev];
+						}
+						else
+							monthOfYearResponseErr[i] = [0, 0];
+					}
+
 					//push to client                
-					socket.emit('pushedMetrics', { dept: data.dept, courseCode: data.courseCode, lecturePeriodHist: lecturePeriodHist, lecturePeriodResponseHist: lecturePeriodResponseHist, lecturePeriodResponseErr: lecturePeriodResponseErr, dayOfWeekHist: dayOfWeekHist, dayOfWeekResponseHist: dayOfWeekResponseHist, dayOfWeekResponseErr: dayOfWeekResponseErr, monthOfYearHist: monthOfYearHist, deptHist: deptHist, courseHist: courseHist, roomHist: roomHist });
+					socket.emit('pushedMetrics', {
+						dept: data.dept, courseCode: data.courseCode, 
+						lecturePeriodHist: lecturePeriodHist, lecturePeriodResponseHist: lecturePeriodResponseHist, lecturePeriodResponseErr: lecturePeriodResponseErr, 
+						dayOfWeekHist: dayOfWeekHist, dayOfWeekResponseHist: dayOfWeekResponseHist, dayOfWeekResponseErr: dayOfWeekResponseErr, 
+						weekOfYearHist: weekOfYearHist, weekOfYearResponseHist: weekOfYearResponseHist, weekOfYearResponseErr: weekOfYearResponseErr, 
+						monthOfYearHist: monthOfYearHist, monthOfYearResponseHist: monthOfYearResponseHist, monthOfYearResponseErr: monthOfYearResponseErr, 
+						deptHist: deptHist, courseHist: courseHist, roomHist: roomHist
+					});
 				}
 			});
 			

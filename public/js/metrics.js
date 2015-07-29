@@ -67,6 +67,7 @@ function onPushedMetrics(data)
         $('#alertDBError').slideDown();
     }
     else {
+        console.log(data);
         $('#alertDBError').slideUp();
         //only plot dept distribution if we aren't looking at a specific dept
         if (data.deptHist && !data.dept)
@@ -85,8 +86,14 @@ function onPushedMetrics(data)
             chartDailyDistributionPie(data.dayOfWeekHist);
         if (data.dayOfWeekResponseHist)
             chartDayOfWeekResponseBar(data.dayOfWeekResponseHist, data.dayOfWeekResponseErr);
+        if (data.weekOfYearHist)
+            chartWeeklyDistributionBar(data.weekOfYearHist);
+        if (data.weekOfYearResponseHist)
+            chartWeekOfYearResponseBar(data.weekOfYearResponseHist, data.weekOfYearResponseErr);
         if (data.monthOfYearHist)
-            chartMonthlyDistributionBar(data.monthOfYearHist, data.monthOfYearErr);
+            chartMonthlyDistributionBar(data.monthOfYearHist);
+        if (data.monthOfYearResponseHist)
+            chartMonthOfYearResponseBar(data.monthOfYearResponseHist, data.monthOfYearResponseErr);
     }
 }
 
@@ -166,14 +173,93 @@ function chartDayOfWeekResponseBar(dist, distErr) {
     chartHistogramBar('#dayOfWeekResponseChart', 'Average student response by day of the week', 'Responses', ['Sun','Mon','Tues','Wed','Thurs','Fri','Sat'], 'Number of responses', dist, distErr);
 }
 
+function chartWeeklyDistributionBar(dist, distErr) {
+    var totalPolls = 0;
+    for (var i in dist)
+        totalPolls += dist[i];
+
+    var nonEmptyDist = [];
+    var nonEmptyDistErr = [];
+    var xVals = [];
+
+    var j=0;
+    for (var i in dist) {
+        if (dist[i] || j) {
+            xVals[j] = 'Week ' +  i;
+            nonEmptyDist[j] = dist[i];
+            if (distErr)
+                nonEmptyDistErr[j] = distErr[i];
+            j++;
+        }        
+    }
+    chartHistogramBar('#weekOfYearChart', 'Weekly distribution: ' + totalPolls + ' polls', 'Polls', xVals, 'Number of polls', nonEmptyDist, nonEmptyDistErr, 0);
+}
+
 function chartMonthlyDistributionBar(dist, distErr) {
     if (dist.length != 12)
         return;
     var totalPolls = 0;
-    for (var i = 0; i < 12; i++)
+    for (var i in dist)
         totalPolls += dist[i];
     
-    chartHistogramBar('#monthOfYearChart', 'Monthly distribution: ' + totalPolls + ' polls', 'Polls', ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], 'Number of polls', dist, distErr, 0);       
+    var nonEmptyDist = [];
+    var nonEmptyDistErr = [];
+    var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var xVals = [];
+
+    var j = 0;
+    for (var i in dist) {
+        if (dist[i] || j) {
+            xVals[j] = months[i];
+            nonEmptyDist[j] = dist[i];
+            if (distErr)
+                nonEmptyDistErr[j] = distErr[i];
+            j++;
+        }
+    }
+
+    chartHistogramBar('#monthOfYearChart', 'Monthly distribution: ' + totalPolls + ' polls', 'Polls', xVals, 'Number of polls', nonEmptyDist, nonEmptyDistErr, 0);
+}
+
+function chartMonthOfYearResponseBar(dist, distErr) {
+    if (dist.length != 12)
+        return;
+
+    var nonEmptyDist = [];
+    var nonEmptyDistErr = [];
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var xVals = [];
+
+    var j = 0;
+    for (var i in dist) {
+        if (dist[i] || j) {
+            xVals[j] = months[i];
+            nonEmptyDist[j] = dist[i];
+            if (distErr)
+                nonEmptyDistErr[j] = distErr[i];
+            j++;
+        }
+    }
+
+    chartHistogramBar('#monthOfYearResponseChart', 'Average student response by month of the year', 'Responses', xVals, 'Number of responses', nonEmptyDist, nonEmptyDistErr);
+}
+
+function chartWeekOfYearResponseBar(dist, distErr) {
+    var nonEmptyDist = [];
+    var nonEmptyDistErr = [];
+    var xVals = [];
+
+    var j = 0;
+    for (var i in dist) {
+        if (dist[i] || j) {
+            xVals[j] = 'Week '+i;
+            nonEmptyDist[j] = dist[i];
+            if (distErr)
+                nonEmptyDistErr[j] = distErr[i];
+            j++;
+        }
+    }
+    chartHistogramBar('#weekOfYearResponseChart', 'Average student response by week of the year', 'Responses', xVals, 'Number of responses', nonEmptyDist, nonEmptyDistErr);
 }
 
 function chartHistogramBar(element, titleText, seriesName, categories, yTitle, dist, distErr, numDecimals) {
