@@ -196,8 +196,6 @@ function chartWeeklyDistributionBar(dist, distErr) {
 }
 
 function chartMonthlyDistributionBar(dist, distErr) {
-    if (dist.length != 12)
-        return;
     var totalPolls = 0;
     for (var i in dist)
         totalPolls += dist[i];
@@ -222,9 +220,6 @@ function chartMonthlyDistributionBar(dist, distErr) {
 }
 
 function chartMonthOfYearResponseBar(dist, distErr) {
-    if (dist.length != 12)
-        return;
-
     var nonEmptyDist = [];
     var nonEmptyDistErr = [];
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
