@@ -95,11 +95,13 @@ function submitPoll(pollName, option)
 			if (data.reason == 'missingData')
 				$("#pollErrorDetails").html("<b>Error</b>: Missing data. Refresh the page to reconnect.");
 			else if (data.reason == 'invalidPoll')
-				$("#pollErrorDetails").html("<b>Error</b>: Poll is no longer open. Refresh the page to reconnect.");
+				$("#pollErrorDetails").html("<b>Error</b>: Poll is no longer available. Refresh the page to reconnect.");
 			else if (data.reason == 'outOfRange')
 				$("#pollErrorDetails").html("<b>Error</b>: Poll entry is out of range. Try another option.");
 			else if (data.reason == 'duplicate')
 				$("#pollErrorDetails").html("<b>Error</b>: You have already answered this poll. If you believe this is incorrect, try refreshing the page.");
+			else if (data.reason == 'closedPoll')
+				$("#pollErrorDetails").html("<b>Error</b>: Poll has been closed.");
 			else
 				$("#pollErrorDetails").html("<b>Error</b>: An unknown error occurred.");
 				
