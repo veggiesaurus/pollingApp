@@ -78,7 +78,8 @@ mongo.connect(dbURL, function (err, db) {
 		socket.on('courseCode', function (data) {onCourseCodeProvided(socket, data);});
 		socket.on('auth', function (data) { onAuth(socket, data); });
 		socket.on('authMetrics', function (data){onAuthMetrics(socket,data);});		
-		socket.on('newPoll', function (data){addNewPoll(socket, data);});	
+		socket.on('newPoll', function (data){addNewPoll(socket, data);});
+		socket.on('closePoll', function (data){closePoll(socket, data);});	
 		socket.on('pollSubmission', function (data){onPollSubmission(socket, data);});	
 	});
 
@@ -138,7 +139,7 @@ mongo.connect(dbURL, function (err, db) {
 		
 			//emit poll to everyone else
 			console.log(data.courseCode+": Pushing new poll to students: "+data.pollName);
-			mapPolls[data.courseCode]={pollName: data.pollName, numOptions:data.numOptions, submittedClients:{}};
+			mapPolls[data.courseCode]={pollName: data.pollName, numOptions:data.numOptions, closed: false, submittedClients:{}};
 			io.sockets.in(data.courseCode).emit('pushNewPoll', {pollName: data.pollName, numOptions:data.numOptions});
 		
 			//emit success to the lecturer
@@ -195,6 +196,39 @@ mongo.connect(dbURL, function (err, db) {
 		}
 	}
 	
+	function closePoll(socket, data)
+	{	
+		if (data.dept && data.courseCode)
+			data.courseCode=data.courseCode.toUpperCase();
+		else
+		{
+			socket.emit('closedPoll', {pollName: data.pollName, success: false});
+			return;
+		};
+		var deptPasswordMD5=getPasswordForDept(data.dept);
+		var saltedHash=crypto.createHash('md5').update(deptPasswordMD5+mapSalts[socket.id]).digest("hex");
+		if(deptPasswordMD5 && data.passwordMD5==saltedHash && data.pollName && data.courseCode)
+		{
+			data.courseCode=data.courseCode.toUpperCase();
+			if (mapPolls[data.courseCode] && mapPolls[data.courseCode].pollName == data.pollName)
+			{
+				mapPolls[data.courseCode].closed = true;
+				//clear callback timers for sockets and DB
+				if (mapTimers[data.courseCode])
+					clearTimeout(mapTimers[data.courseCode]);
+				if (mapTimersDB[data.courseCode])
+					clearTimeout(mapTimersDB[data.courseCode]);
+				console.log(data.courseCode+": Closing poll: "+data.pollName);
+				socket.emit('closedPoll', {pollName: data.pollName, success: true});
+			}
+			else
+				socket.emit('closedPoll', {pollName: data.pollName, success: false, reason: 'invalidPoll'});			
+		}
+		else		
+			socket.emit('closedPoll', {pollName: data.pollName, success: false, reason: 'authError'});		
+	}
+	
+	
 	function onPollSubmission(socket, data) {
 		if (data.courseCode)
 			data.courseCode = data.courseCode.toUpperCase();
@@ -206,6 +240,10 @@ mongo.connect(dbURL, function (err, db) {
 		else if (!mapPolls[data.courseCode] || data.pollName != mapPolls[data.courseCode].pollName) {
 			console.log("Invalid poll reply: poll is not available");
 			socket.emit('pollSubmissionComplete', { pollName: data.pollName, success: false, reason: 'invalidPoll' });
+		}
+		else if (mapPolls[data.courseCode].closed) {
+			console.log("Invalid poll reply: poll has been closed");
+			socket.emit('pollSubmissionComplete', { pollName: data.pollName, success: false, reason: 'closedPoll' });
 		}
 		else if (data.submission < 1 || data.submission > mapResults[data.courseCode].results.length + 1) {
 			console.log("Invalid poll reply: submission is out of range");
