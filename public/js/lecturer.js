@@ -29,7 +29,7 @@ window.onload = function()
 {   
 	$('#alertAuthError').hide();
 	$("#btnNewPoll").addClass('ui-disabled');
-	$("#btnClosePoll").addClass('ui-disabled');
+	$("#btnClosePoll").addClass('disabled');
 	location.hash="";
 	messages = [];
 	polls = [];	
@@ -116,7 +116,7 @@ function onPushedNewPoll(data)
 		console.log("Poll "+data.pollName+" has been pushed to students");			
 		$("#pollPanel").slideUp();
 		$('#resultsChart').slideUp();
-		$("#btnClosePoll").removeClass('ui-disabled');		
+		$("#btnClosePoll").removeClass('disabled');		
 		firstUpdate=true;
 		
 	}
@@ -129,7 +129,7 @@ function onClosedPoll(data)
 	if (data.success)
 	{
 		console.log("Poll "+data.pollName+" has been closed");
-		$("#btnClosePoll").addClass('ui-disabled');
+		$("#btnClosePoll").addClass('disabled');
 	}
 	else
 		console.log("Poll "+data.pollName+" has not been closed. Reason: "+data.reason);
