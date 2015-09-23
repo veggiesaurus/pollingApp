@@ -28,8 +28,7 @@ function initFunction()
 window.onload = function() 
 {   
 	$('#alertAuthError').hide();
-	$("#btnNewPoll").addClass('ui-disabled');
-	$("#btnClosePoll").addClass('disabled');
+	$("#btnNewPoll").addClass('ui-disabled');	
 	location.hash="";
 	messages = [];
 	polls = [];	
