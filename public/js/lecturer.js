@@ -136,7 +136,7 @@ function onClosedPoll(data)
 }
 
 function onPushedResults(data)
-{
+{	
 	var dataChanged=false;
 	for (var i=0;i<results.length;i++)
 	{
@@ -195,7 +195,8 @@ function closePoll()
 	console.log("Unhashed salt: "+unhashedSalt);
 	var saltedHash=hex_md5(unhashedSalt);
 	console.log("Salted Hash: "+saltedHash);
-	socket.emit('closePoll', {passwordMD5: saltedHash, dept: dept, courseCode: sessionStorage.getItem("courseCode"), pollName: $('#pollName').val()});
+	var data = {passwordMD5: saltedHash, dept: dept, courseCode: sessionStorage.getItem("courseCode"), pollName: pollName};
+	socket.emit('closePoll', data);
 }
 
 function hidePollPanel()
