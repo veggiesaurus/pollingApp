@@ -28,7 +28,7 @@ function initFunction()
 window.onload = function() 
 {   
 	$('#alertAuthError').hide();
-	$("#btnNewPoll").addClass('ui-disabled');		
+	$("#btnNewPoll").addClass('ui-disabled');	
 	location.hash="";
 	messages = [];
 	polls = [];	
@@ -50,7 +50,8 @@ window.onload = function()
 	});
 	
 	socket.on('authComplete', onAuthComplete);	
-	socket.on('pushedNewPoll', onPushedNewPoll);	
+	socket.on('pushedNewPoll', onPushedNewPoll);
+	socket.on('closedPoll', onClosedPoll);	
 	socket.on('pushResults', onPushedResults);
 }
 
@@ -78,6 +79,7 @@ function setupEvents()
 	$("#btnLogin").off().click(submitAuth);		
 	$("#btnReAuth").off().click(submitAuth);	
 	$("#btnNewPoll").off().click(addNewPoll);
+	$("#btnClosePoll").off().click(closePoll);
 	$("#btnAcceptPoll").off().click(createPoll);
 	$("#btnCancelPoll").off().click(hidePollPanel);
 	$("#password").focus();
@@ -112,7 +114,8 @@ function onPushedNewPoll(data)
 	{
 		console.log("Poll "+data.pollName+" has been pushed to students");			
 		$("#pollPanel").slideUp();
-		$('#resultsChart').slideUp();			
+		$('#resultsChart').slideUp();
+		$("#btnClosePoll").removeClass('disabled');		
 		firstUpdate=true;
 		
 	}
@@ -120,8 +123,19 @@ function onPushedNewPoll(data)
 		console.log("Poll has not been pushed to students");					
 }
 
-function onPushedResults(data)
+function onClosedPoll(data)
 {
+	if (data.success)
+	{
+		console.log("Poll "+data.pollName+" has been closed");
+		$("#btnClosePoll").addClass('disabled');
+	}
+	else
+		console.log("Poll "+data.pollName+" has not been closed. Reason: "+data.reason);
+}
+
+function onPushedResults(data)
+{	
 	var dataChanged=false;
 	for (var i=0;i<results.length;i++)
 	{
@@ -169,6 +183,19 @@ function addNewPoll()
 	$("#pollName").attr("value", proposedName);	
 	$('#pollName').focus();
 	$('#pollName').select();
+}
+
+function closePoll()
+{
+	if (!loggedIn)
+		return;
+	console.log("Closing Poll");
+	var unhashedSalt=sessionStorage.getItem("passwordMD5")+salt;
+	console.log("Unhashed salt: "+unhashedSalt);
+	var saltedHash=hex_md5(unhashedSalt);
+	console.log("Salted Hash: "+saltedHash);
+	var data = {passwordMD5: saltedHash, dept: dept, courseCode: sessionStorage.getItem("courseCode"), pollName: pollName};
+	socket.emit('closePoll', data);
 }
 
 function hidePollPanel()
